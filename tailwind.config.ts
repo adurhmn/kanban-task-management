@@ -2,6 +2,7 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
+  darkMode: "selector",
   theme: {
     extend: {
       colors: {
@@ -11,7 +12,7 @@ const config: Config = {
             DEFAULT: "#635FC7",
             light: "#A8A4FF",
           },
-          red: {
+          destructive: {
             DEFAULT: "#EA5555",
             light: "#FF9898",
           },

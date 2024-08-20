@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  font-family: "Plus Jakarta Sans", monospace;
+  font-family: "Plus Jakarta Sans", sans-serif;
 }
 
 @layer utilities {
