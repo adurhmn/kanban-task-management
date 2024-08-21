@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "./components/core/button";
 import { Subtask } from "./components/ui/subtask";
+import { Input } from "./components/core/input";
 
 function App() {
   const [checked, setChecked] = useState(false);
@@ -36,6 +37,7 @@ function App() {
         }}
         task="Testing 1, 2, 3..."
       />
+      <Input placeholder="Testing 1, 2, 3..." errMsg="Can't be empty"/>
     </div>
   );
 }
