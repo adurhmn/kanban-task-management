@@ -1,7 +1,16 @@
 import { useState } from "react";
-import { Button } from "./components/core/button";
+import {
+  Button,
+  Input,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "./components/core";
 import { Subtask } from "./components/ui/subtask";
-import { Input } from "./components/core/input";
 
 function App() {
   const [checked, setChecked] = useState(false);
@@ -37,7 +46,21 @@ function App() {
         }}
         task="Testing 1, 2, 3..."
       />
-      <Input placeholder="Testing 1, 2, 3..." errMsg="Can't be empty"/>
+      <Input placeholder="Testing 1, 2, 3..." errMsg="Can't be empty" />
+      <Select>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Select a fruit" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectItem value="apple">Apple</SelectItem>
+            <SelectItem value="banana">Banana</SelectItem>
+            <SelectItem value="blueberry">Blueberry</SelectItem>
+            <SelectItem value="grapes">Grapes</SelectItem>
+            <SelectItem value="pineapple">Pineapple</SelectItem>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
     </div>
   );
 }
