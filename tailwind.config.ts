@@ -6,7 +6,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        x: {
+        cust: {
           // primary
           prim: {
             DEFAULT: "#635FC7",
