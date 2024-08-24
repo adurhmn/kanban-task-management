@@ -1,6 +1,6 @@
 import Header from "@/components/ui/header";
 import SideNav from "@/components/ui/sidenav";
-import { useConnectIDB } from "./libs/hooks/useConnectIDB";
+import { useConnectIDB } from "@/libs/hooks/idb";
 
 function App() {
   useConnectIDB();

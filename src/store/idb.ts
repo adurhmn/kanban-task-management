@@ -7,7 +7,7 @@ interface IDBStore {
 
 const useIDBStore = create<IDBStore>((set) => ({
   db: null,
-  setDB: (db: IDBDatabase) => set({ db }),
+  setDB: (db) => set({ db }),
 }));
 
 export { useIDBStore };
