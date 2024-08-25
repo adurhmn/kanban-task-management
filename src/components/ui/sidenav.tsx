@@ -4,6 +4,19 @@ import cn from "@/libs/utils/cn";
 import IconLightTheme from "@/assets/icons/light-theme";
 import IconDarkTheme from "@/assets/icons/dark-theme";
 import { useBoards } from "@/libs/hooks/kanban";
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  Input,
+} from "@/components/core";
+import { memo, useState } from "react";
+import { useForm } from "react-hook-form";
+import getRandId from "@/libs/utils/getRandId";
+import IconCross from "@/assets/icons/cross";
 
 function ThemeToggle() {
   return (
@@ -14,19 +27,98 @@ function ThemeToggle() {
   );
 }
 
-function CreateBtn({ onClick }: { onClick: () => void }) {
+const CreateBtn = memo(() => {
+  const {
+    register,
+    unregister,
+    formState: { errors },
+    handleSubmit,
+  } = useForm();
+
+  const [cols, setCols] = useState([`col-${getRandId()}`]);
+
+  const handleCreate = (data: any) => {
+    console.log({ data });
+  };
+
+  console.log({ errors });
+
   return (
-    <button
-      className={cn(
-        "w-full min-w-[200px] py-4 px-6 flex items-center gap-3 cursor-pointer hover:bg-cust-slate-100"
-      )}
-      onClick={onClick}
-    >
-      <Plus className="text-cust-prim" size={16} />
-      <p className={"h3 whitespace-nowrap text-cust-prim"}>Create New Board</p>
-    </button>
+    <Dialog>
+      <DialogTrigger>
+        <button
+          className={cn(
+            "w-full min-w-[200px] py-4 px-6 flex items-center gap-3 cursor-pointer hover:bg-cust-slate-100"
+          )}
+        >
+          <Plus className="text-cust-prim" size={16} />
+          <p className={"h3 whitespace-nowrap text-cust-prim"}>
+            Create New Board
+          </p>
+        </button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add New Board</DialogTitle>
+        </DialogHeader>
+        <form
+          onSubmit={handleSubmit(handleCreate)}
+          className="flex flex-col gap-5"
+        >
+          <div>
+            <h4 className="p2 text-cust-slate-300 mb-2">Board Name</h4>
+            <Input
+              placeholder="e.g: Web Design"
+              {...register("boardName", { required: "Board name requied" })}
+              errMsg={errors["boardName"]?.message as string}
+            />
+          </div>
+          <div>
+            <h4 className="p2 text-cust-slate-300 mb-2">{`Board Columns (${cols.length})`}</h4>
+            <div className="flex flex-col gap-3">
+              {cols.map((id) => (
+                <div className="flex gap-3 items-center" key={id}>
+                  <Input
+                  placeholder="e.g: Pending / Current / Completed"
+                    {...register(id, { required: "Column name requied" })}
+                    errMsg={errors[id]?.message as string}
+                  />
+                  <button
+                    disabled={cols.length === 1}
+                    className="mx-2 disabled:opacity-50"
+                    onClick={() =>
+                      setCols((prev) => {
+                        unregister(id);
+                        return prev.filter((_id) => _id !== id);
+                      })
+                    }
+                  >
+                    <IconCross />
+                  </button>
+                </div>
+              ))}
+              <Button
+                variant={"secondary"}
+                className="w-full flex gap-2 items-center"
+                onClick={() =>
+                  setCols((prev) => [...prev, `col-${getRandId()}`])
+                }
+              >
+                <Plus className="text-cust-prim" size={16} />
+                <p className={"p1 whitespace-nowrap text-cust-prim"}>
+                  Add New Column
+                </p>
+              </Button>
+            </div>
+          </div>
+          <Button type="submit" className="w-full">
+            <p className="p1">Add New Board</p>
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
-}
+});
 
 function NavItem({
   name,
@@ -90,11 +182,7 @@ export default function SideNav() {
                 />
               ))}
             </ul>
-            <CreateBtn
-              onClick={() => {
-                addBoard("TestBoard");
-              }}
-            />
+            <CreateBtn />
           </>
         )}
       </div>
