@@ -2,7 +2,7 @@ import { addItem, getItems } from "./idb";
 import { BOARDS_STORE } from "@/libs/constants";
 import { Board } from "@/libs/types";
 
-async function getBoards() {
+async function getBoards(): Promise<Board[] | null> {
   return getItems(BOARDS_STORE);
 }
 

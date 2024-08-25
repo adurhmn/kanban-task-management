@@ -28,14 +28,23 @@ function CreateBtn({ onClick }: { onClick: () => void }) {
   );
 }
 
-function NavItem({ name, isActive }: { name: string; isActive?: boolean }) {
+function NavItem({
+  name,
+  onClick,
+  isActive,
+}: {
+  name: string;
+  onClick: () => void;
+  isActive?: boolean;
+}) {
   return (
     <li className="w-full">
-      <div
+      <button
         className={cn(
           "min-w-[200px] w-[85%] py-4 px-6 flex items-center gap-3 rounded-tr-full rounded-br-full cursor-pointer hover:bg-cust-slate-100",
           { "bg-cust-prim hover:bg-cust-prim": isActive }
         )}
+        onClick={onClick}
       >
         <IconBoard
           pathClassName={isActive ? "fill-white" : "fill-cust-slate-300"}
@@ -48,12 +57,13 @@ function NavItem({ name, isActive }: { name: string; isActive?: boolean }) {
         >
           {name}
         </p>
-      </div>
+      </button>
     </li>
   );
 }
 export default function SideNav() {
-  const { boards, isLoading, addBoard } = useBoards();
+  const { boards, activeBoard, setActiveBoard, isLoading, addBoard } =
+    useBoards();
 
   return (
     <div className="w-[300px] border-cust-slate-200 border-r">
@@ -72,7 +82,12 @@ export default function SideNav() {
                 </p>
               )}
               {boards!.map((b) => (
-                <NavItem name={b.name} key={b.id} />
+                <NavItem
+                  name={b.name}
+                  key={b.id}
+                  isActive={activeBoard === b.id}
+                  onClick={() => setActiveBoard(b.id)}
+                />
               ))}
             </ul>
             <CreateBtn
