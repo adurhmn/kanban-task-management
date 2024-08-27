@@ -1,6 +1,7 @@
 import Header from "@/components/ui/header";
 import SideNav from "@/components/ui/sidenav";
 import { useConnectIDB } from "@/libs/hooks/idb";
+import Dashboard from "./components/ui/dashboard";
 
 function App() {
   useConnectIDB();
@@ -10,6 +11,7 @@ function App() {
       <Header />
       <div className="flex h-full flex-shrink">
         <SideNav />
+        <Dashboard />
       </div>
     </main>
   );

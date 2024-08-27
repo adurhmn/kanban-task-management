@@ -4,4 +4,12 @@ interface Board {
   index?: string;
 }
 
-export type { Board };
+interface Column {
+  id: string;
+  name: string;
+  boardId: string;
+  color?: string;
+  index?: string;
+}
+
+export type { Board, Column };

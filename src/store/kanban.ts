@@ -1,4 +1,4 @@
-import { Board } from "@/libs/types";
+import { Board, Column } from "@/libs/types";
 import { create } from "zustand";
 
 interface BoardStore {
@@ -8,6 +8,12 @@ interface BoardStore {
   removeBoard: (id: string) => void;
   setBoards: (boards: Board[]) => void;
   setActiveBoard: (id: string) => void;
+}
+
+interface ColumnStore {
+  columns: { [boardId: string]: Column[] } | null;
+  addColumns: (column: Column[], boardId: string) => void;
+  removeColumn: (colId: string, boardId: string) => void;
 }
 
 const useBoardStore = create<BoardStore>((set) => ({
@@ -25,4 +31,27 @@ const useBoardStore = create<BoardStore>((set) => ({
   setActiveBoard: (id) => set({ activeBoard: id }),
 }));
 
-export { useBoardStore };
+const useColumnStore = create<ColumnStore>((set) => ({
+  columns: null,
+  addColumns: (columns, boardId) => {
+    set((state) => ({
+      columns: {
+        ...state.columns,
+        [boardId]: state.columns?.[boardId]
+          ? [...state.columns[boardId], ...columns]
+          : [...columns],
+      },
+    }));
+  },
+  removeColumn: (colId, boardId) =>
+    set((state) => ({
+      columns: state.columns
+        ? {
+            ...state.columns,
+            [boardId]: state.columns[boardId].filter((c) => c.id !== colId),
+          }
+        : null,
+    })),
+}));
+
+export { useBoardStore, useColumnStore };

@@ -1,11 +1,23 @@
 import { useIDBStore } from "@/store";
 import { useEffect } from "react";
-import { ALL_STORES, IDB_NAME, IDB_VERSION } from "../constants";
+import {
+  ALL_STORES,
+  BOARDS_STORE,
+  COLUMNS_STORE,
+  IDB_NAME,
+  IDB_VERSION,
+  INDEXES,
+  TASKS_STORE,
+} from "../constants";
 
 function loadV1Schema(db: IDBDatabase) {
-  for (const store of ALL_STORES) {
-    db.createObjectStore(store, { keyPath: "id" });
-  }
+  const boardsStore = db.createObjectStore(BOARDS_STORE, { keyPath: "id" });
+  const columnsStore = db.createObjectStore(COLUMNS_STORE, { keyPath: "id" });
+  const tasksStore = db.createObjectStore(TASKS_STORE, { keyPath: "id" });
+
+  columnsStore.createIndex(INDEXES[COLUMNS_STORE].BOARD_ID, "boardId", {
+    unique: false,
+  });
 }
 
 const useConnectIDB = () => {

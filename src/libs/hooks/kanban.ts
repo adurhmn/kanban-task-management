@@ -1,7 +1,7 @@
-import { useBoardStore, useIDBStore } from "@/store";
+import { useBoardStore, useColumnStore, useIDBStore } from "@/store";
 import { useCallback, useEffect } from "react";
 import * as KanbanService from "@/services/kanban";
-import { createBoard } from "@/libs/utils/kanban";
+import { createBoard, createColumn } from "@/libs/utils/kanban";
 import { LOCAL_KEYS } from "../constants";
 
 // this is the abstract wrapper that can be directly used in components
@@ -16,17 +16,30 @@ const useBoards = () => {
     removeBoard: removeBoardFromStore,
     setBoards: setBoardsToStore,
   } = useBoardStore();
-
+  const { addColumns: addColumnsToStore, removeColumn: removeColumnFromStore } =
+    useColumnStore();
 
   const addBoard = useCallback(
-    (name: string) => {
+    (name: string, columnNames?: string[]) => {
       const board = createBoard(name);
       addBoardToStore(board); // optimistic updation
-      KanbanService.addBoard(board).catch((err) => {
-        console.log(err);
-        removeBoardFromStore(board.id);
-        alert("Board Creation Failed");
-      });
+      KanbanService.addBoard(board)
+        .then(() => {
+          columnNames?.forEach((name) => {
+            const column = createColumn({ name, boardId: board.id });
+            addColumnsToStore([column], board.id);
+            KanbanService.addColumn(column).catch((err) => {
+              console.log(err);
+              removeColumnFromStore(column.id, board.id);
+              alert("Column creation Failed");
+            });
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          removeBoardFromStore(board.id);
+          alert("Board Creation Failed");
+        });
     },
     [addBoardToStore, removeBoardFromStore]
   );
@@ -63,7 +76,6 @@ const useBoards = () => {
     }
   }, [boards, activeBoard, setActiveBoard]);
 
-
   return {
     boards,
     activeBoard,
@@ -73,6 +85,39 @@ const useBoards = () => {
   };
 };
 
-export { useBoards };
+// how are you gonna handle drag & drop of tasks?
+
+// get board id and return columns
+const useColumns = () => {
+  const { isLoading: isBoardsLoading, activeBoard } = useBoards();
+  const {
+    columns,
+    addColumns: addColumnsToStore,
+    removeColumn: removeColumnFromStore,
+  } = useColumnStore();
+
+  useEffect(() => {
+    if (
+      !isBoardsLoading &&
+      activeBoard &&
+      (!columns || !columns[activeBoard])
+    ) {
+      KanbanService.getColumns(activeBoard).then((cols) => {
+        if (cols) {
+          addColumnsToStore(cols, activeBoard);
+        }
+      });
+    }
+  }, [isBoardsLoading, activeBoard]);
+
+  return {
+    columns: columns ? columns[activeBoard] : null,
+    isLoading: columns === null || !columns[activeBoard],
+  };
+};
+
+// get column id (+? board id) and return tasks
+const useTasks = () => {};
+export { useBoards, useColumns };
 
 // component => useBoards => call service + update useBoardStore
