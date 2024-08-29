@@ -8,8 +8,8 @@ interface Column {
   id: string;
   name: string;
   boardId: string;
+  index: number;
   color?: string;
-  index?: string;
 }
 
 export type { Board, Column };

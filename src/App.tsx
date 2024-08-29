@@ -2,9 +2,12 @@ import Header from "@/components/ui/header";
 import SideNav from "@/components/ui/sidenav";
 import { useConnectIDB } from "@/libs/hooks/idb";
 import Dashboard from "./components/ui/dashboard";
+import { useBoardSync, useColumnSync } from "./libs/hooks/kanban";
 
 function App() {
   useConnectIDB();
+  useBoardSync();
+  useColumnSync();
 
   return (
     <main className="w-screen h-screen overflow-hidden flex flex-col">

@@ -5,7 +5,7 @@ function createBoard(name: string, index: number): Board {
   return {
     id: getRandId(),
     name,
-    index
+    index,
   };
 }
 
@@ -13,15 +13,19 @@ function createColumn({
   name,
   boardId,
   color,
+  index,
 }: {
   name: string;
   boardId: string;
+  index: number;
   color?: string;
 }): Column {
   return {
     id: getRandId(),
     name,
     boardId,
+    index,
+    ...(color ? { color } : null),
   };
 }
 

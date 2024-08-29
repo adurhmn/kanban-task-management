@@ -31,4 +31,8 @@ async function addColumn(column: Column) {
   return addItemToStore(COLUMNS_STORE, column);
 }
 
-export { getBoards, addBoard, updateBoards, addColumn, getColumns };
+async function updateColumns(columns: Column[]) {
+  return putItemsToStore(COLUMNS_STORE, columns);
+}
+
+export { getBoards, addBoard, updateBoards, addColumn, getColumns, updateColumns };

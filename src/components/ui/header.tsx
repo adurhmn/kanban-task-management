@@ -1,10 +1,10 @@
 import imgLogoDark from "@/assets/logo-dark.svg";
 import { Button } from "@/components/core";
-import { useBoards } from "@/libs/hooks/kanban";
+import { useBoardStore } from "@/store";
 import { Plus } from "lucide-react";
 
 export default function Header() {
-  const {activeBoard} = useBoards()
+  const { activeBoard } = useBoardStore();
 
   return (
     <div className="flex items-center h-[80px]">
@@ -15,7 +15,7 @@ export default function Header() {
         <h1 className="h1 mr-auto">Platform Launch</h1>
         <div>
           <Button disabled={!activeBoard}>
-            <Plus className="mr-2"/>
+            <Plus className="mr-2" />
             <p>Add new task</p>
           </Button>
         </div>

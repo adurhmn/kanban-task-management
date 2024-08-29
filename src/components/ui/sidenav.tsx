@@ -3,7 +3,6 @@ import { Plus } from "lucide-react";
 import cn from "@/libs/utils/cn";
 import IconLightTheme from "@/assets/icons/light-theme";
 import IconDarkTheme from "@/assets/icons/dark-theme";
-import { useBoards } from "@/libs/hooks/kanban";
 import {
   Button,
   Dialog,
@@ -24,6 +23,8 @@ import {
   Droppable,
 } from "@hello-pangea/dnd";
 import { DROPPABLE_TYPE } from "@/libs/constants/dnd";
+import { useBoardStore } from "@/store";
+import { addBoard, setActiveBoard } from "@/actions/kanban/boards";
 
 function ThemeToggle() {
   return (
@@ -34,128 +35,119 @@ function ThemeToggle() {
   );
 }
 
-const CreateBtn = memo(
-  ({
-    addBoard,
-  }: {
-    addBoard: (boardName: string, colNames?: string[]) => void;
-  }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const {
-      register,
-      unregister,
-      formState: { errors },
-      handleSubmit,
-      reset: resetForm,
-    } = useForm();
+const CreateBtn = memo(() => {
+  const [isOpen, setIsOpen] = useState(false);
+  const {
+    register,
+    unregister,
+    formState: { errors },
+    handleSubmit,
+    reset: resetForm,
+  } = useForm();
 
-    const [cols, setCols] = useState([`col-${getRandId()}`]);
+  const [cols, setCols] = useState([`col-${getRandId()}`]);
 
-    const reset = useCallback(() => {
-      setCols([`col-${getRandId()}`]);
-      resetForm();
-    }, []);
+  const reset = useCallback(() => {
+    setCols([`col-${getRandId()}`]);
+    resetForm();
+  }, []);
 
-    const handleCreate = useCallback(
-      ({ boardName, ...colNames }: any) => {
-        addBoard(boardName, Object.values(colNames));
-        reset();
-        setIsOpen(false);
-      },
-      [addBoard]
-    );
+  const handleCreate = useCallback(({ boardName, ...colNames }: any) => {
+    addBoard(boardName, Object.values(colNames));
+    reset();
+    setIsOpen(false);
+  }, []);
 
-    console.log({ errors });
+  console.log({ errors });
 
-    return (
-      <Dialog
-        open={isOpen}
-        onOpenChange={(open) => {
-          if (open) {
-            if (!isOpen) setIsOpen(true);
-          } else {
-            if (isOpen) setIsOpen(false);
-            setTimeout(reset, 200);
-          }
-        }}
-      >
-        <DialogTrigger>
-          <button
-            className={cn(
-              "w-full min-w-[200px] py-4 px-6 flex items-center gap-3 cursor-pointer hover:bg-cust-slate-100"
-            )}
-          >
-            <Plus className="text-cust-prim" size={16} />
-            <p className={"h3 whitespace-nowrap text-cust-prim"}>
-              Create New Board
-            </p>
-          </button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add New Board</DialogTitle>
-          </DialogHeader>
-          <form
-            onSubmit={handleSubmit(handleCreate)}
-            className="flex flex-col gap-5"
-          >
-            <div>
-              <h4 className="p2 text-cust-slate-300 mb-2">Board Name</h4>
-              <Input
-                placeholder="e.g: Web Design"
-                {...register("boardName", { required: "Board name requied" })}
-                errMsg={errors["boardName"]?.message as string}
-              />
+  return (
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (open) {
+          if (!isOpen) setIsOpen(true);
+        } else {
+          if (isOpen) setIsOpen(false);
+          setTimeout(reset, 200);
+        }
+      }}
+    >
+      <DialogTrigger>
+        <button
+          className={cn(
+            "w-full min-w-[200px] py-4 px-6 flex items-center gap-3 cursor-pointer hover:bg-cust-slate-100"
+          )}
+        >
+          <Plus className="text-cust-prim" size={16} />
+          <p className={"h3 whitespace-nowrap text-cust-prim"}>
+            Create New Board
+          </p>
+        </button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add New Board</DialogTitle>
+        </DialogHeader>
+        <form
+          onSubmit={handleSubmit(handleCreate)}
+          className="flex flex-col gap-5"
+        >
+          <div>
+            <h4 className="p2 text-cust-slate-300 mb-2">Board Name</h4>
+            <Input
+              placeholder="e.g: Web Design"
+              {...register("boardName", { required: "Board name requied" })}
+              errMsg={errors["boardName"]?.message as string}
+            />
+          </div>
+          <div>
+            <h4 className="p2 text-cust-slate-300 mb-2">{`Board Columns (${cols.length})`}</h4>
+            <div className="flex flex-col gap-3">
+              {cols.map((id, idx) => (
+                <div className="flex gap-3 items-center" key={id}>
+                  <Input
+                    autoFocus={idx === cols.length - 1}
+                    placeholder="e.g: Pending / Current / Completed"
+                    {...register(id, { required: "Column name requied" })}
+                    errMsg={errors[id]?.message as string}
+                  />
+                  <button
+                    disabled={cols.length === 1}
+                    className="mx-2 disabled:opacity-50"
+                    onClick={() =>
+                      setCols((prev) => {
+                        unregister(id);
+                        return prev.filter((_id) => _id !== id);
+                      })
+                    }
+                  >
+                    <IconCross />
+                  </button>
+                </div>
+              ))}
+              <Button
+                variant={"secondary"}
+                type="button"
+                className="w-full flex gap-2 items-center"
+                onClick={() =>
+                  setCols((prev) => [...prev, `col-${getRandId()}`])
+                }
+              >
+                <Plus className="text-cust-prim" size={16} />
+                <p className={"p1 whitespace-nowrap text-cust-prim"}>
+                  Add New Column
+                </p>
+              </Button>
             </div>
-            <div>
-              <h4 className="p2 text-cust-slate-300 mb-2">{`Board Columns (${cols.length})`}</h4>
-              <div className="flex flex-col gap-3">
-                {cols.map((id, idx) => (
-                  <div className="flex gap-3 items-center" key={id}>
-                    <Input
-                      autoFocus={idx === cols.length - 1}
-                      placeholder="e.g: Pending / Current / Completed"
-                      {...register(id, { required: "Column name requied" })}
-                      errMsg={errors[id]?.message as string}
-                    />
-                    <button
-                      disabled={cols.length === 1}
-                      className="mx-2 disabled:opacity-50"
-                      onClick={() =>
-                        setCols((prev) => {
-                          unregister(id);
-                          return prev.filter((_id) => _id !== id);
-                        })
-                      }
-                    >
-                      <IconCross />
-                    </button>
-                  </div>
-                ))}
-                <Button
-                  variant={"secondary"}
-                  type="button"
-                  className="w-full flex gap-2 items-center"
-                  onClick={() =>
-                    setCols((prev) => [...prev, `col-${getRandId()}`])
-                  }
-                >
-                  <Plus className="text-cust-prim" size={16} />
-                  <p className={"p1 whitespace-nowrap text-cust-prim"}>
-                    Add New Column
-                  </p>
-                </Button>
-              </div>
-            </div>
-            <Button type="submit" className="w-full">
-              <p className="p1">Add New Board</p>
-            </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
-    );
-  }
-);
+          </div>
+          <Button type="submit" className="w-full">
+            <p className="p1">Add New Board</p>
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+});
 
 const NavItem = ({
   name,
@@ -171,7 +163,11 @@ const NavItem = ({
   snapshot: DraggableStateSnapshot;
 }) => {
   return (
-    <li ref={provided.innerRef} className="w-ful mt-2" {...provided.draggableProps}>
+    <li
+      ref={provided.innerRef}
+      className="w-ful mt-2"
+      {...provided.draggableProps}
+    >
       <button
         className={cn(
           "min-w-[200px] w-[85%] py-4 px-6 flex items-center gap-3 rounded-tr-full rounded-br-full cursor-pointer hover:bg-cust-slate-100",
@@ -198,16 +194,15 @@ const NavItem = ({
 };
 
 export default function SideNav() {
-  const { boards, activeBoard, setActiveBoard, isLoading, addBoard } =
-    useBoards();
+  const { boards, activeBoard } = useBoardStore();
 
   return (
-    <div className="w-[300px] border-cust-slate-200 border-r">
+    <div className="min-w-[300px] border-cust-slate-200 border-r">
       <h4 className="h4 text-md my-6 text-cust-slate-300 px-6">
-        {`ALL BOARDS (${boards ? boards.length : null})`}
+        {`ALL BOARDS (${boards ? boards.length : "?"})`}
       </h4>
       <div className="h-[700px] max-h-[700px] flex flex-col">
-        {isLoading ? (
+        {boards === null ? (
           "Boards Loading"
         ) : (
           <>
@@ -219,7 +214,7 @@ export default function SideNav() {
                 <ul
                   ref={provided.innerRef}
                   className={cn(
-                    "list-none flex flex-col overflow-y-auto", // dont use gap because of dnd limitations, used margin on child
+                    "list-none flex flex-col overflow-y-auto" // dont use gap because of dnd limitations, used margin on child
                     // snapshot.isDraggingOver && "bg-cust-prim/20"
                   )}
                   {...provided.droppableProps}
@@ -241,7 +236,9 @@ export default function SideNav() {
                           name={b.name}
                           key={b.id}
                           isActive={activeBoard === b.id}
-                          onClick={() => setActiveBoard(b.id)}
+                          onClick={() => {
+                            setActiveBoard(b.id);
+                          }}
                           provided={provided}
                           snapshot={snapshot}
                         />
@@ -252,7 +249,7 @@ export default function SideNav() {
                 </ul>
               )}
             </Droppable>
-            <CreateBtn addBoard={addBoard} />
+            <CreateBtn />
           </>
         )}
       </div>
