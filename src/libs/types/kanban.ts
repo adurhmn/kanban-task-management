@@ -1,7 +1,7 @@
 interface Board {
   id: string;
   name: string;
-  index?: string;
+  index: number; 
 }
 
 interface Column {

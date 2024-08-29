@@ -19,9 +19,11 @@ const useBoards = () => {
   const { addColumns: addColumnsToStore, removeColumn: removeColumnFromStore } =
     useColumnStore();
 
+  const lastIndex = boards ? boards.length - 1 : -1;
+
   const addBoard = useCallback(
     (name: string, columnNames?: string[]) => {
-      const board = createBoard(name);
+      const board = createBoard(name, lastIndex + 1);
       addBoardToStore(board); // optimistic updation
       KanbanService.addBoard(board)
         .then(() => {
@@ -41,7 +43,7 @@ const useBoards = () => {
           alert("Board Creation Failed");
         });
     },
-    [addBoardToStore, removeBoardFromStore]
+    [addBoardToStore, removeBoardFromStore, lastIndex]
   );
 
   const setActiveBoard = useCallback(
@@ -57,7 +59,7 @@ const useBoards = () => {
       KanbanService.getBoards()
         .then((boards) => {
           if (boards) {
-            setBoardsToStore(boards);
+            setBoardsToStore(boards.sort((a, b) => a.index - b.index));
           }
         })
         .catch((err) => {

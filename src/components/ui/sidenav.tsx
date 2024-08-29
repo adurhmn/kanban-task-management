@@ -17,6 +17,13 @@ import { memo, useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import getRandId from "@/libs/utils/getRandId";
 import IconCross from "@/assets/icons/cross";
+import {
+  Draggable,
+  DraggableProvided,
+  DraggableStateSnapshot,
+  Droppable,
+} from "@hello-pangea/dnd";
+import { DROPPABLE_TYPE } from "@/libs/constants/dnd";
 
 function ThemeToggle() {
   return (
@@ -150,23 +157,29 @@ const CreateBtn = memo(
   }
 );
 
-function NavItem({
+const NavItem = ({
   name,
   onClick,
   isActive,
+  provided,
+  snapshot,
 }: {
   name: string;
   onClick: () => void;
   isActive?: boolean;
-}) {
+  provided: DraggableProvided;
+  snapshot: DraggableStateSnapshot;
+}) => {
   return (
-    <li className="w-full">
+    <li ref={provided.innerRef} className="w-ful mt-2" {...provided.draggableProps}>
       <button
         className={cn(
           "min-w-[200px] w-[85%] py-4 px-6 flex items-center gap-3 rounded-tr-full rounded-br-full cursor-pointer hover:bg-cust-slate-100",
-          { "bg-cust-prim hover:bg-cust-prim": isActive }
+          { "bg-cust-prim hover:bg-cust-prim": isActive },
+          { "bg-cust-slate-100": snapshot.isDragging }
         )}
         onClick={onClick}
+        {...provided.dragHandleProps}
       >
         <IconBoard
           pathClassName={isActive ? "fill-white" : "fill-cust-slate-300"}
@@ -182,7 +195,8 @@ function NavItem({
       </button>
     </li>
   );
-}
+};
+
 export default function SideNav() {
   const { boards, activeBoard, setActiveBoard, isLoading, addBoard } =
     useBoards();
@@ -197,21 +211,47 @@ export default function SideNav() {
           "Boards Loading"
         ) : (
           <>
-            <ul className="list-none flex flex-col gap-2 overflow-y-auto">
-              {boards!.length === 0 && (
-                <p className="p2 text-cust-slate-300 p-3 text-center">
-                  No Boards Created
-                </p>
+            <Droppable
+              droppableId="sidenav-boards"
+              type={DROPPABLE_TYPE.BOARDS}
+            >
+              {(provided, snapshot) => (
+                <ul
+                  ref={provided.innerRef}
+                  className={cn(
+                    "list-none flex flex-col overflow-y-auto", // dont use gap because of dnd limitations, used margin on child
+                    // snapshot.isDraggingOver && "bg-cust-prim/20"
+                  )}
+                  {...provided.droppableProps}
+                >
+                  {boards!.length === 0 && (
+                    <p className="p2 text-cust-slate-300 p-3 text-center">
+                      No Boards Created
+                    </p>
+                  )}
+                  {boards!.map((b, idx) => (
+                    <Draggable
+                      key={b.id}
+                      draggableId={b.id}
+                      index={idx}
+                      disableInteractiveElementBlocking
+                    >
+                      {(provided, snapshot) => (
+                        <NavItem
+                          name={b.name}
+                          key={b.id}
+                          isActive={activeBoard === b.id}
+                          onClick={() => setActiveBoard(b.id)}
+                          provided={provided}
+                          snapshot={snapshot}
+                        />
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </ul>
               )}
-              {boards!.map((b) => (
-                <NavItem
-                  name={b.name}
-                  key={b.id}
-                  isActive={activeBoard === b.id}
-                  onClick={() => setActiveBoard(b.id)}
-                />
-              ))}
-            </ul>
+            </Droppable>
             <CreateBtn addBoard={addBoard} />
           </>
         )}

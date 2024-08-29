@@ -1,4 +1,9 @@
-import { addItemToStore, getItemsByIndex, getItemsByStore } from "./idb";
+import {
+  addItemToStore,
+  getItemsByIndex,
+  getItemsByStore,
+  putItemsToStore,
+} from "./idb";
 import { BOARDS_STORE, COLUMNS_STORE, INDEXES } from "@/libs/constants";
 import { Board, Column } from "@/libs/types";
 
@@ -8,6 +13,10 @@ async function getBoards(): Promise<Board[] | null> {
 
 async function addBoard(board: Board) {
   return addItemToStore(BOARDS_STORE, board);
+}
+
+async function updateBoards(boards: Board[]) {
+  return putItemsToStore(BOARDS_STORE, boards);
 }
 
 async function getColumns(boardId: string): Promise<Column[] | null> {
@@ -22,4 +31,4 @@ async function addColumn(column: Column) {
   return addItemToStore(COLUMNS_STORE, column);
 }
 
-export { getBoards, addBoard, addColumn, getColumns };
+export { getBoards, addBoard, updateBoards, addColumn, getColumns };

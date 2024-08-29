@@ -66,6 +66,27 @@ async function addItemToStore(storeKey: string, recordData: any) {
   });
 }
 
+async function putItemsToStore(storeKey: string, recordData: any[]) {
+  const db = useIDBStore.getState().db;
+  if (!db) return null;
+
+  const tx = db.transaction(storeKey, "readwrite");
+  const store = tx.objectStore(storeKey);
+  return Promise.all(
+    recordData.map((data) => {
+      const req = store.put(data);
+      return new Promise((resolve, reject) => {
+        req.onsuccess = () => {
+          resolve(req.result);
+        };
+        req.onerror = () => {
+          reject(req.error);
+        };
+      });
+    })
+  );
+}
+
 async function getItemsByStore(storeKey: string): Promise<Array<any> | null> {
   const db = useIDBStore.getState().db;
   if (!db) return null;
@@ -83,4 +104,10 @@ async function getItemsByStore(storeKey: string): Promise<Array<any> | null> {
   });
 }
 
-export { addItemToStore, getItemByPK, getItemsByStore, getItemsByIndex };
+export {
+  addItemToStore,
+  getItemByPK,
+  getItemsByStore,
+  getItemsByIndex,
+  putItemsToStore,
+};
