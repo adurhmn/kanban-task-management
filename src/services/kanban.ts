@@ -4,8 +4,14 @@ import {
   getItemsByStore,
   putItemsToStore,
 } from "./idb";
-import { BOARDS_STORE, COLUMNS_STORE, INDEXES } from "@/libs/constants";
-import { Board, Column } from "@/libs/types";
+import {
+  BOARDS_STORE,
+  COLUMNS_STORE,
+  INDEXES,
+  SUBTASKS_STORE,
+  TASKS_STORE,
+} from "@/libs/constants";
+import { Board, Column, Subtask, Task } from "@/libs/types";
 
 async function getBoards(): Promise<Board[] | null> {
   return getItemsByStore(BOARDS_STORE);
@@ -35,4 +41,31 @@ async function updateColumns(columns: Column[]) {
   return putItemsToStore(COLUMNS_STORE, columns);
 }
 
-export { getBoards, addBoard, updateBoards, addColumn, getColumns, updateColumns };
+async function addTask(task: Task) {
+  return addItemToStore(TASKS_STORE, task);
+}
+
+async function getTasks(colId: string): Promise<Task[] | null> {
+  return getItemsByIndex(TASKS_STORE, INDEXES[TASKS_STORE].COLUMN_ID, colId);
+}
+
+async function updateTasks(tasks: Task[]) {
+  return putItemsToStore(TASKS_STORE, tasks);
+}
+
+async function addSubtask(subtask: Subtask) {
+  return addItemToStore(SUBTASKS_STORE, subtask);
+}
+
+export {
+  getBoards,
+  addBoard,
+  updateBoards,
+  addColumn,
+  getColumns,
+  updateColumns,
+  addTask,
+  addSubtask,
+  getTasks,
+  updateTasks
+};

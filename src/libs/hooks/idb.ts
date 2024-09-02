@@ -1,12 +1,12 @@
 import { useIDBStore } from "@/store";
 import { useEffect } from "react";
 import {
-  ALL_STORES,
   BOARDS_STORE,
   COLUMNS_STORE,
   IDB_NAME,
   IDB_VERSION,
   INDEXES,
+  SUBTASKS_STORE,
   TASKS_STORE,
 } from "../constants";
 
@@ -14,8 +14,15 @@ function loadV1Schema(db: IDBDatabase) {
   const boardsStore = db.createObjectStore(BOARDS_STORE, { keyPath: "id" });
   const columnsStore = db.createObjectStore(COLUMNS_STORE, { keyPath: "id" });
   const tasksStore = db.createObjectStore(TASKS_STORE, { keyPath: "id" });
+  const subtasksStore = db.createObjectStore(SUBTASKS_STORE, { keyPath: "id" });
 
   columnsStore.createIndex(INDEXES[COLUMNS_STORE].BOARD_ID, "boardId", {
+    unique: false,
+  });
+  tasksStore.createIndex(INDEXES[TASKS_STORE].COLUMN_ID, "columnId", {
+    unique: false,
+  });
+  subtasksStore.createIndex(INDEXES[SUBTASKS_STORE].TASK_ID, "taskId", {
     unique: false,
   });
 }

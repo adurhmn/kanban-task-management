@@ -1,5 +1,5 @@
 import { DROPPABLE_TYPE } from "@/libs/constants/dnd";
-import { useBoardStore, useColumnStore } from "@/store";
+import { useBoardStore, useColumnStore, useTaskStore } from "@/store";
 import {
   DragDropContext as DragDropContextRaw,
   OnDragEndResponder,
@@ -10,6 +10,7 @@ import * as KanbanService from "@/services/kanban";
 const DragDropContext = ({ children }: { children: ReactNode }) => {
   const { boards, setBoards, activeBoard } = useBoardStore();
   const { columns, setColumns } = useColumnStore();
+  const { tasks, setTasks } = useTaskStore();
 
   const onBeforeCapture = useCallback(() => {
     /*...*/
@@ -93,9 +94,47 @@ const DragDropContext = ({ children }: { children: ReactNode }) => {
             alert("Cols index updation failed");
           });
         }
+      } else if (event.type === DROPPABLE_TYPE.TASKS) {
+        if (event.destination && tasks) {
+          if (event.source.droppableId === event.destination.droppableId) {
+            console.log("same col");
+            // same column
+            let newTasks = [...tasks[event.source.droppableId]];
+            const [removed] = newTasks.splice(event.source.index, 1);
+            newTasks.splice(event.destination.index, 0, removed);
+            newTasks = newTasks.map((t, i) => ({ ...t, index: i }));
+            // update only the column
+            setTasks(newTasks, event.source.droppableId);
+            KanbanService.updateTasks(newTasks).catch((err) => {
+              console.log({ err });
+              alert("Tasks index updation failed");
+            });
+          } else {
+            console.log("different col");
+            // different column
+            let sourceTasks = [...tasks[event.source.droppableId]];
+            let destTasks = [...tasks[event.destination.droppableId]];
+            const [removed] = sourceTasks.splice(event.source.index, 1);
+            destTasks.splice(event.destination.index, 0, {
+              ...removed,
+              columnId: event.destination.droppableId,
+            });
+            sourceTasks = sourceTasks.map((t, i) => ({ ...t, index: i }));
+            destTasks = destTasks.map((t, i) => ({ ...t, index: i }));
+            // update both columns
+            setTasks(sourceTasks, event.source.droppableId);
+            setTasks(destTasks, event.destination.droppableId);
+            KanbanService.updateTasks([...sourceTasks, ...destTasks]).catch(
+              (err) => {
+                console.log({ err });
+                alert("Tasks index updation failed");
+              }
+            );
+          }
+        }
       }
     },
-    [boards, setBoards, activeBoard, columns, setColumns]
+    [boards, setBoards, activeBoard, columns, setColumns, tasks, setTasks]
   );
 
   return (

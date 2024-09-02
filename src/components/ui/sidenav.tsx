@@ -58,8 +58,6 @@ const CreateBtn = memo(() => {
     setIsOpen(false);
   }, []);
 
-  console.log({ errors });
-
   return (
     <Dialog
       open={isOpen}
@@ -73,7 +71,7 @@ const CreateBtn = memo(() => {
       }}
     >
       <DialogTrigger>
-        <button
+        <div
           className={cn(
             "w-full min-w-[200px] py-4 px-6 flex items-center gap-3 cursor-pointer hover:bg-cust-slate-100"
           )}
@@ -82,7 +80,7 @@ const CreateBtn = memo(() => {
           <p className={"h3 whitespace-nowrap text-cust-prim"}>
             Create New Board
           </p>
-        </button>
+        </div>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

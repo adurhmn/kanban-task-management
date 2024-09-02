@@ -1,5 +1,5 @@
 import { LOCAL_KEYS } from "@/libs/constants";
-import { Board, Column } from "@/libs/types";
+import { Board, Column, Subtask, Task } from "@/libs/types";
 import { create } from "zustand";
 
 interface BoardStore {
@@ -16,6 +16,20 @@ interface ColumnStore {
   addColumns: (column: Column[], boardId: string) => void;
   setColumns: (column: Column[], boardId: string) => void;
   removeColumn: (colId: string, boardId: string) => void;
+}
+
+interface TaskStore {
+  tasks: { [columnId: string]: Task[] } | null;
+  addTasks: (tasks: Task[], columnId: string) => void;
+  setTasks: (tasks: Task[], columnId: string) => void;
+  removeTask: (taskId: string, colId: string) => void;
+}
+
+interface SubtaskStore {
+  subtasks: { [subtaskId: string]: Subtask[] } | null;
+  addSubtasks: (subtasks: Subtask[], taskId: string) => void;
+  setSubtasks: (subtasks: Subtask[], taskId: string) => void;
+  removeSubtask: (subtaskId: string, taskId: string) => void;
 }
 
 const useBoardStore = create<BoardStore>((set) => ({
@@ -77,4 +91,66 @@ const useColumnStore = create<ColumnStore>((set) => ({
     })),
 }));
 
-export { useBoardStore, useColumnStore };
+const useTaskStore = create<TaskStore>((set) => ({
+  tasks: null,
+  addTasks: (tasks, colId) => {
+    set((state) => ({
+      tasks: {
+        ...state.tasks,
+        [colId]: state.tasks?.[colId]
+          ? [...state.tasks[colId], ...tasks]
+          : [...tasks],
+      },
+    }));
+  },
+  setTasks: (tasks, colId) => {
+    set((state) => ({
+      tasks: {
+        ...state.tasks,
+        [colId]: tasks,
+      },
+    }));
+  },
+  removeTask: (taskId, colId) =>
+    set((state) => ({
+      tasks: state.tasks
+        ? {
+            ...state.tasks,
+            [colId]: state.tasks[colId].filter((c) => c.id !== taskId),
+          }
+        : null,
+    })),
+}));
+
+const useSubtaskStore = create<SubtaskStore>((set) => ({
+  subtasks: null,
+  addSubtasks: (subtasks, taskId) => {
+    set((state) => ({
+      subtasks: {
+        ...state.subtasks,
+        [taskId]: state.subtasks?.[taskId]
+          ? [...state.subtasks[taskId], ...subtasks]
+          : [...subtasks],
+      },
+    }));
+  },
+  setSubtasks: (subtasks, taskId) => {
+    set((state) => ({
+      subtasks: {
+        ...state.subtasks,
+        [taskId]: subtasks,
+      },
+    }));
+  },
+  removeSubtask: (subtaskId, taskId) =>
+    set((state) => ({
+      subtasks: state.subtasks
+        ? {
+            ...state.subtasks,
+            [taskId]: state.subtasks[taskId].filter((c) => c.id !== subtaskId),
+          }
+        : null,
+    })),
+}));
+
+export { useBoardStore, useColumnStore, useTaskStore, useSubtaskStore };
