@@ -7,7 +7,7 @@ interface SubtaskProps {
   onCheckedChange: (checked: boolean) => void;
 }
 
-export function Subtask({ task, checked, onCheckedChange }: SubtaskProps) {
+export default function Subtask({ task, checked, onCheckedChange }: SubtaskProps) {
   return (
     <div
       className={cn(

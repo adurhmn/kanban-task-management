@@ -1,4 +1,5 @@
 import { Task as ITask } from "@/libs/types";
+import { useTaskStore } from "@/store";
 import { DraggableProvided, DraggableStateSnapshot } from "@hello-pangea/dnd";
 const Task = ({
   task,
@@ -9,10 +10,15 @@ const Task = ({
   provided: DraggableProvided;
   snapshot: DraggableStateSnapshot;
 }) => {
+  const { setActiveTask } = useTaskStore();
+
   return (
     <div
       className="w-full rounded-lg shadow-md p-4 bg-white mb-5"
       ref={provided.innerRef}
+      onClick={() => {
+        setActiveTask({ taskId: task.id, colId: task.columnId });
+      }}
       {...provided.draggableProps}
       {...provided.dragHandleProps}
     >

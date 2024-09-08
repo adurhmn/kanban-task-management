@@ -5,6 +5,7 @@ import { useBoardStore, useColumnStore } from "@/store";
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 import { DROPPABLE_TYPE } from "@/libs/constants/dnd";
 import Column from "./column";
+import { TaskModal } from "../modals";
 
 export default function Dashboard() {
   const { activeBoard } = useBoardStore();
@@ -60,6 +61,7 @@ export default function Dashboard() {
             )}
           </Droppable>
         )}
+        <TaskModal />
       </div>
     </>
   );

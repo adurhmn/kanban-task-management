@@ -1,5 +1,7 @@
 import {
   addItemToStore,
+  deleteItemFromStore,
+  deleteItemsByIndex,
   getItemsByIndex,
   getItemsByStore,
   putItemsToStore,
@@ -13,19 +15,19 @@ import {
 } from "@/libs/constants";
 import { Board, Column, Subtask, Task } from "@/libs/types";
 
-async function getBoards(): Promise<Board[] | null> {
+export async function getBoards(): Promise<Board[] | null> {
   return getItemsByStore(BOARDS_STORE);
 }
 
-async function addBoard(board: Board) {
+export async function addBoard(board: Board) {
   return addItemToStore(BOARDS_STORE, board);
 }
 
-async function updateBoards(boards: Board[]) {
+export async function updateBoards(boards: Board[]) {
   return putItemsToStore(BOARDS_STORE, boards);
 }
 
-async function getColumns(boardId: string): Promise<Column[] | null> {
+export async function getColumns(boardId: string): Promise<Column[] | null> {
   return getItemsByIndex(
     COLUMNS_STORE,
     INDEXES[COLUMNS_STORE].BOARD_ID,
@@ -33,39 +35,70 @@ async function getColumns(boardId: string): Promise<Column[] | null> {
   );
 }
 
-async function addColumn(column: Column) {
+export async function addColumn(column: Column) {
   return addItemToStore(COLUMNS_STORE, column);
 }
 
-async function updateColumns(columns: Column[]) {
+export async function updateColumns(columns: Column[]) {
   return putItemsToStore(COLUMNS_STORE, columns);
 }
 
-async function addTask(task: Task) {
+export async function addTask(task: Task) {
   return addItemToStore(TASKS_STORE, task);
 }
 
-async function getTasks(colId: string): Promise<Task[] | null> {
+export async function putTask(task: Task) {
+  return putItemsToStore(TASKS_STORE, [task]);
+}
+
+export async function getTasks(colId: string): Promise<Task[] | null> {
   return getItemsByIndex(TASKS_STORE, INDEXES[TASKS_STORE].COLUMN_ID, colId);
 }
 
-async function updateTasks(tasks: Task[]) {
+export async function updateTasks(tasks: Task[]) {
   return putItemsToStore(TASKS_STORE, tasks);
 }
 
-async function addSubtask(subtask: Subtask) {
+export async function addSubtask(subtask: Subtask) {
   return addItemToStore(SUBTASKS_STORE, subtask);
 }
 
-export {
-  getBoards,
-  addBoard,
-  updateBoards,
-  addColumn,
-  getColumns,
-  updateColumns,
-  addTask,
-  addSubtask,
-  getTasks,
-  updateTasks
-};
+export async function getSubtasks(taskId: string): Promise<Subtask[] | null> {
+  return getItemsByIndex(
+    SUBTASKS_STORE,
+    INDEXES[SUBTASKS_STORE].TASK_ID,
+    taskId
+  );
+}
+
+export async function putSubtasks(subtasks: Partial<Subtask>[]) {
+  return putItemsToStore(SUBTASKS_STORE, subtasks);
+}
+
+export async function deleteSubtask(subtaskId: string) {
+  return deleteItemFromStore(SUBTASKS_STORE, subtaskId);
+}
+
+export async function deleteSubtasks(taskId: string) {
+  return deleteItemsByIndex(
+    SUBTASKS_STORE,
+    INDEXES[SUBTASKS_STORE].TASK_ID,
+    taskId
+  );
+}
+
+export async function deleteTask(taskId: string) {
+  return deleteItemFromStore(TASKS_STORE, taskId);
+}
+
+export async function putTasks(tasks: Partial<Task>[]) {
+  return putItemsToStore(TASKS_STORE, tasks);
+}
+
+// export async function deleteTasks(columnId: string) {
+//   return deleteItemsByIndex(
+//     TASKS_STORE,
+//     INDEXES[TASKS_STORE].COLUMN_ID,
+//     columnId
+//   );
+// }

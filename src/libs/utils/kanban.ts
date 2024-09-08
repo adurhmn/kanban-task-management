@@ -54,17 +54,19 @@ function createSubtask({
   desc,
   taskId,
   index,
+  isComplete = false,
 }: {
   desc: string;
   taskId: string;
   index: number;
+  isComplete?: boolean;
 }): Subtask {
   return {
     id: getRandId(),
     desc,
     index,
     taskId,
-    isComplete: false,
+    isComplete,
   };
 }
 

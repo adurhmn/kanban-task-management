@@ -2,6 +2,7 @@ import { LOCAL_KEYS } from "@/libs/constants";
 import { Board, Column, Subtask, Task } from "@/libs/types";
 import { create } from "zustand";
 
+// TODO: sort data on view, instead of on store
 interface BoardStore {
   boards: Board[] | null;
   activeBoard: string;
@@ -20,16 +21,18 @@ interface ColumnStore {
 
 interface TaskStore {
   tasks: { [columnId: string]: Task[] } | null;
+  activeTask: { colId: string; taskId: string } | null; // opens task view
+  setActiveTask: (_: { colId: string; taskId: string } | null) => void;
   addTasks: (tasks: Task[], columnId: string) => void;
   setTasks: (tasks: Task[], columnId: string) => void;
-  removeTask: (taskId: string, colId: string) => void;
+  deleteTask: (taskId: string, colId: string) => Task | null;
 }
 
 interface SubtaskStore {
   subtasks: { [subtaskId: string]: Subtask[] } | null;
   addSubtasks: (subtasks: Subtask[], taskId: string) => void;
   setSubtasks: (subtasks: Subtask[], taskId: string) => void;
-  removeSubtask: (subtaskId: string, taskId: string) => void;
+  deleteSubtask: (subtaskId: string, taskId: string) => Subtask | null;
 }
 
 const useBoardStore = create<BoardStore>((set) => ({
@@ -85,22 +88,32 @@ const useColumnStore = create<ColumnStore>((set) => ({
       columns: state.columns
         ? {
             ...state.columns,
-            [boardId]: state.columns[boardId].filter((c) => c.id !== colId),
+            [boardId]:
+              state.columns[boardId]?.filter((c) => c.id !== colId) || [],
           }
         : null,
     })),
 }));
 
-const useTaskStore = create<TaskStore>((set) => ({
+const useTaskStore = create<TaskStore>((set, getStore) => ({
   tasks: null,
+  activeTask: null,
+  setActiveTask: (_) => set({ activeTask: _ }),
   addTasks: (tasks, colId) => {
     set((state) => ({
       tasks: {
         ...state.tasks,
         [colId]: state.tasks?.[colId]
-          ? [...state.tasks[colId], ...tasks]
-          : [...tasks],
+          ? [...state.tasks[colId], ...tasks].sort((a, b) => a.index - b.index)
+          : [...tasks].sort((a, b) => a.index - b.index),
       },
+      // asdf: {
+      //   ...asdf,
+      //   ...tasks.reduce((acc, t) => {
+      //     acc[t.id] = t;
+      //     return acc;
+      //   }, {}),
+      // },
     }));
   },
   setTasks: (tasks, colId) => {
@@ -111,26 +124,35 @@ const useTaskStore = create<TaskStore>((set) => ({
       },
     }));
   },
-  removeTask: (taskId, colId) =>
+  deleteTask: (taskId, colId) => {
+    const taskToRemove = getStore().tasks?.[colId]?.find(
+      (t) => t.id === taskId
+    );
+
     set((state) => ({
       tasks: state.tasks
         ? {
             ...state.tasks,
-            [colId]: state.tasks[colId].filter((c) => c.id !== taskId),
+            [colId]: state.tasks[colId]?.filter((t) => t.id !== taskId) || [],
           }
         : null,
-    })),
+    }));
+
+    return taskToRemove ? taskToRemove : null;
+  },
 }));
 
-const useSubtaskStore = create<SubtaskStore>((set) => ({
+const useSubtaskStore = create<SubtaskStore>((set, getStore) => ({
   subtasks: null,
   addSubtasks: (subtasks, taskId) => {
     set((state) => ({
       subtasks: {
         ...state.subtasks,
         [taskId]: state.subtasks?.[taskId]
-          ? [...state.subtasks[taskId], ...subtasks]
-          : [...subtasks],
+          ? [...state.subtasks[taskId], ...subtasks].sort(
+              (a, b) => a.index - b.index
+            )
+          : [...subtasks].sort((a, b) => a.index - b.index),
       },
     }));
   },
@@ -142,15 +164,23 @@ const useSubtaskStore = create<SubtaskStore>((set) => ({
       },
     }));
   },
-  removeSubtask: (subtaskId, taskId) =>
+  deleteSubtask: (subtaskId, taskId) => {
+    const subtaskToRemove = getStore().subtasks?.[taskId]?.find(
+      (st) => st.id === subtaskId
+    );
+
     set((state) => ({
       subtasks: state.subtasks
         ? {
             ...state.subtasks,
-            [taskId]: state.subtasks[taskId].filter((c) => c.id !== subtaskId),
+            [taskId]:
+              state.subtasks[taskId]?.filter((st) => st.id !== subtaskId) || [],
           }
         : null,
-    })),
+    }));
+
+    return subtaskToRemove ? subtaskToRemove : null;
+  },
 }));
 
 export { useBoardStore, useColumnStore, useTaskStore, useSubtaskStore };

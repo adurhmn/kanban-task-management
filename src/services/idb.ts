@@ -8,7 +8,7 @@ async function getItemByPK(storeKey: string, recordKey: string) {
   const tx = db.transaction(storeKey, "readonly");
   const store = tx.objectStore(storeKey);
   const req = store.get(recordKey);
-  await new Promise((resolve, reject) => {
+  new Promise((resolve, reject) => {
     req.onsuccess = () => {
       resolve(req.result);
     };
@@ -31,7 +31,7 @@ async function getItemsByIndex(
   const index = store.index(indexName);
   const cursor = index.openCursor(IDBKeyRange.only(indexQuery));
   const results: Column[] = [];
-  return await new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     cursor.onsuccess = (event) => {
       const cursor = (
         event.target as IDBRequest<IDBCursorWithValue | undefined>
@@ -56,7 +56,7 @@ async function addItemToStore(storeKey: string, recordData: any) {
   const tx = db.transaction(storeKey, "readwrite");
   const store = tx.objectStore(storeKey);
   const req = store.add(recordData); // key will be inferred from data.
-  await new Promise((resolve, reject) => {
+  new Promise((resolve, reject) => {
     req.onsuccess = () => {
       resolve(req.result);
     };
@@ -70,6 +70,7 @@ async function putItemsToStore(storeKey: string, recordData: any[]) {
   const db = useIDBStore.getState().db;
   if (!db) return null;
 
+  // TODO: get old props and merge them with new before putting, this does not happen internally in indexeddb
   const tx = db.transaction(storeKey, "readwrite");
   const store = tx.objectStore(storeKey);
   return Promise.all(
@@ -104,10 +105,64 @@ async function getItemsByStore(storeKey: string): Promise<Array<any> | null> {
   });
 }
 
+async function deleteItemFromStore(storeKey: string, pkValue: string) {
+  const db = useIDBStore.getState().db;
+  if (!db) return null;
+
+  const tx = db.transaction(storeKey, "readwrite");
+  const store = tx.objectStore(storeKey);
+  const req = store.delete(pkValue);
+  new Promise((resolve, reject) => {
+    req.onsuccess = () => {
+      resolve(req.result);
+    };
+    req.onerror = () => {
+      reject(req.error);
+    };
+  });
+}
+
+async function deleteItemsByIndex(
+  storeKey: string,
+  indexName: string,
+  indexQuery: string
+): Promise<boolean | null> {
+  const db = useIDBStore.getState().db;
+  if (!db) return null;
+
+  const tx = db.transaction(storeKey, "readwrite");
+  const store = tx.objectStore(storeKey);
+  const index = store.index(indexName);
+  const cursor = index.openCursor(IDBKeyRange.only(indexQuery));
+  return new Promise((resolve, reject) => {
+    cursor.onsuccess = (event) => {
+      const cursor = (
+        event.target as IDBRequest<IDBCursorWithValue | undefined>
+      ).result;
+      if (cursor) {
+        const req = cursor.delete();
+        req.onsuccess = () => {
+          cursor.continue();
+        };
+        req.onerror = () => {
+          reject(req.error);
+        };
+      } else {
+        resolve(true);
+      }
+    };
+    cursor.onerror = () => {
+      reject(cursor.error);
+    };
+  });
+}
+
 export {
   addItemToStore,
   getItemByPK,
   getItemsByStore,
   getItemsByIndex,
   putItemsToStore,
+  deleteItemFromStore,
+  deleteItemsByIndex,
 };
