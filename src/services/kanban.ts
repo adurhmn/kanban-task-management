@@ -71,7 +71,7 @@ export async function getSubtasks(taskId: string): Promise<Subtask[] | null> {
   );
 }
 
-export async function putSubtasks(subtasks: Partial<Subtask>[]) {
+export async function putSubtasks(subtasks: Subtask[]) {
   return putItemsToStore(SUBTASKS_STORE, subtasks);
 }
 
@@ -91,7 +91,7 @@ export async function deleteTask(taskId: string) {
   return deleteItemFromStore(TASKS_STORE, taskId);
 }
 
-export async function putTasks(tasks: Partial<Task>[]) {
+export async function putTasks(tasks: Task[]) {
   return putItemsToStore(TASKS_STORE, tasks);
 }
 

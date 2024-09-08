@@ -25,6 +25,10 @@ interface Task {
   status: TaskStatus;
   columnId: string;
   index: number;
+  subtask: {
+    complete: number;
+    incomplete: number;
+  };
 }
 
 interface Subtask {
@@ -36,4 +40,4 @@ interface Subtask {
 }
 
 export type { Board, Column, Task, Subtask };
-export {TaskStatus}
+export { TaskStatus };

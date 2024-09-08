@@ -23,7 +23,13 @@ const Task = ({
       {...provided.dragHandleProps}
     >
       <h3 className="h3">{task.title}</h3>
-      <p className="p">{task.desc}</p>
+      {task.subtask.complete + task.subtask.incomplete > 0 && (
+        <p className="p2 text-cust-slate-300 mt-4">
+          {`${task.subtask.complete} of ${
+            task.subtask.complete + task.subtask.incomplete
+          } Subtasks`}
+        </p>
+      )}
     </div>
   );
 };

@@ -25,6 +25,7 @@ interface TaskStore {
   setActiveTask: (_: { colId: string; taskId: string } | null) => void;
   addTasks: (tasks: Task[], columnId: string) => void;
   setTasks: (tasks: Task[], columnId: string) => void;
+  putTask: (task: Pick<Task, "id"> & Partial<Omit<Task, "id">>) => void;
   deleteTask: (taskId: string, colId: string) => Task | null;
 }
 
@@ -123,6 +124,26 @@ const useTaskStore = create<TaskStore>((set, getStore) => ({
         [colId]: tasks,
       },
     }));
+  },
+  putTask: (task) => {
+    const { tasks } = getStore();
+    const taskToUpdate = tasks?.[task.columnId || ""]?.find(
+      (t) => t.id === task.id
+    );
+
+    if (taskToUpdate) {
+      set((state) => ({
+        tasks: state.tasks
+          ? {
+              ...state.tasks,
+              [task.columnId!]: state.tasks[task.columnId!]?.map((t) =>
+                t.id === task.id ? { ...t, ...task } : t
+              ),
+            }
+          : null,
+      }));
+    }
+    return taskToUpdate ? taskToUpdate : null;
   },
   deleteTask: (taskId, colId) => {
     const taskToRemove = getStore().tasks?.[colId]?.find(

@@ -17,13 +17,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { EllipsisVertical, Plus } from "lucide-react";
 import { useSubtasks, useSubtasksSync } from "@/libs/hooks/kanban/subtasks";
 import Subtask from "@/components/ui/subtask";
-import { putSubtasks } from "@/actions/kanban/subtasks";
+import { putSubtasksAction } from "@/actions/kanban/subtasks";
 import { Controller, useForm } from "react-hook-form";
 import getRandId from "@/libs/utils/getRandId";
 import IconCross from "@/assets/icons/cross";
 import { Subtask as ISubtask, Task, TaskStatus } from "@/libs/types";
 import cn from "@/libs/utils/cn";
-import { deleteTask, editTask } from "@/actions/kanban/tasks";
+import { deleteTaskAction, editTaskAction } from "@/actions/kanban/tasks";
 
 const TaskActions = ({
   onDelete,
@@ -83,18 +83,30 @@ const ViewTaskContent = ({
         <TaskActions activateEditMode={activateEditMode} onDelete={onDelete} />
       </div>
       <p className="p1 text-cust-slate-300">{task.desc}</p>
-      <div className="flex flex-col gap-3">
-        {subtasks.map((st) => (
-          <Subtask
-            key={st.id}
-            checked={st.isComplete}
-            onCheckedChange={(checked) => {
-              putSubtasks([{ ...st, isComplete: checked }], task.id);
-            }}
-            task={st.desc}
-          />
-        ))}
-      </div>
+      {task.subtask.complete + task.subtask.incomplete > 0 && (
+        <div className="flex flex-col gap-3">
+          <p className="p2 text-cust-slate-300">
+            Subtasks{" "}
+            {`(${task.subtask.complete} of ${
+              task.subtask.complete + task.subtask.incomplete
+            })`}
+          </p>
+          {subtasks.map((st) => (
+            <Subtask
+              key={st.id}
+              checked={st.isComplete}
+              onCheckedChange={(checked) => {
+                putSubtasksAction(
+                  [{ ...st, isComplete: checked }],
+                  task.id,
+                  task.columnId
+                );
+              }}
+              task={st.desc}
+            />
+          ))}
+        </div>
+      )}
     </div>
   ) : null;
 };
@@ -133,7 +145,7 @@ const EditTaskContent = ({
   );
 
   const handleUpdate = useCallback((formData: any) => {
-    editTask({ task, oldSubtasks, formData });
+    editTaskAction({ task, oldSubtasks, formData });
     activateViewMode();
   }, []);
 
@@ -276,7 +288,7 @@ const DeleteTaskContent = ({
   onDelete: () => void;
 }) => {
   const handleDelete = () => {
-    deleteTask(task.id, task.columnId);
+    deleteTaskAction(task.id, task.columnId);
     onDelete();
   };
 
@@ -323,7 +335,7 @@ const TaskModal = () => {
         ? tasks[activeTask.colId].find(({ id }) => id === activeTask.taskId)
         : undefined,
     [tasks, activeTask]
-);
+  );
 
   useSubtasksSync(task?.id || "");
   const subtasks = useSubtasks(task?.id || "");

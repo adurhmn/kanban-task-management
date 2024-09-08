@@ -32,21 +32,27 @@ function createColumn({
 function createTask({
   title,
   desc,
-  colId,
+  columnId,
   index,
+  subtask = {
+    complete: 0,
+    incomplete: 0,
+  },
 }: {
-  title: string;
-  desc: string;
-  colId: string;
-  index: number;
+  title: Task["title"];
+  desc: Task["desc"];
+  index: Task["index"];
+  columnId: Task["columnId"];
+  subtask?: Task["subtask"];
 }): Task {
   return {
     id: getRandId(),
     title,
     desc,
     index,
-    columnId: colId,
+    columnId,
     status: TaskStatus.HOLD,
+    subtask,
   };
 }
 

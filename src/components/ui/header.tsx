@@ -1,4 +1,4 @@
-import { addTask } from "@/actions/kanban/tasks";
+import { addTaskAction } from "@/actions/kanban/tasks";
 import IconCross from "@/assets/icons/cross";
 import imgLogoDark from "@/assets/logo-dark.svg";
 import {
@@ -48,7 +48,7 @@ const AddTaskButton = memo(() => {
 
   const handleCreate = useCallback(
     ({ title, desc, colId, ...subtasks }: any) => {
-      addTask({ title, desc, colId, subtasks: Object.values(subtasks) });
+      addTaskAction({ title, desc, colId, subtasks: Object.values(subtasks) });
       reset();
       setIsOpen(false);
     },
