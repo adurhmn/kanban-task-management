@@ -70,7 +70,7 @@ export const putTaskAction = (updatedTask: Task) => {
       oldTasks.map((st) => (st.id === updatedTask.id ? updatedTask : st)),
       updatedTask.columnId
     );
-    KanbanService.putTask(updatedTask).catch((err) => {
+    return KanbanService.putTask(updatedTask).catch((err) => {
       console.log({ err });
       alert("Subtask update failed");
       setTasks(oldTasks, updatedTask.columnId);
@@ -115,7 +115,7 @@ export const putTasksAction = (updatedTasks: Task[], colId: string) => {
   }
 };
 
-export const editTaskAction = ({
+export const editTaskAction = async ({
   task,
   oldSubtasks,
   formData: { title, desc, status, ...subtasks },
@@ -129,12 +129,12 @@ export const editTaskAction = ({
     [subtaskId: string]: string;
   };
 }) => {
-  oldSubtasks.forEach((ost) => {
+  for (const ost of oldSubtasks) {
     if (subtasks[ost.id] === undefined) {
       // delete subtask
-      deleteSubtaskAction(ost.id, task.id, task.columnId);
+      await deleteSubtaskAction(ost.id, task.id, task.columnId);
     }
-  });
+  }
 
   const oldSubtasksMap = oldSubtasks.reduce((acc, cur) => {
     acc[cur.id] = cur;
@@ -160,8 +160,8 @@ export const editTaskAction = ({
     }
   });
 
-  putSubtasksAction(subtasksToPut, task.id, task.columnId);
-  putTaskAction({ ...task, title, desc, status });
+  await putSubtasksAction(subtasksToPut, task.id, task.columnId);
+  await putTaskAction({ ...task, title, desc, status });
 };
 
 export const deleteTaskAction = (taskId: string, colId: string) => {
@@ -187,6 +187,29 @@ export const deleteTaskAction = (taskId: string, colId: string) => {
         console.log({ err });
         alert("Subtask delete failed");
         addTasks([removedTask], colId);
+      });
+  }
+};
+
+export const deleteTasksAction = (colId: string) => {
+  const { setTasks, tasks } = useTaskStore.getState();
+  const copy = tasks?.[colId];
+
+  if (copy) {
+    // optimistic updation
+    setTasks([], colId);
+
+    KanbanService.deleteTasks(colId)
+      .then(() => {
+        for (const task of copy) {
+          deleteSubtasksAction(task.id);
+        }
+      })
+      .catch((err) => {
+        console.log({ err });
+        alert("Task delete failed");
+        console.log({ copy });
+        setTasks(copy, colId);
       });
   }
 };

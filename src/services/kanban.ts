@@ -95,10 +95,22 @@ export async function putTasks(tasks: Task[]) {
   return putItemsToStore(TASKS_STORE, tasks);
 }
 
-// export async function deleteTasks(columnId: string) {
-//   return deleteItemsByIndex(
-//     TASKS_STORE,
-//     INDEXES[TASKS_STORE].COLUMN_ID,
-//     columnId
-//   );
-// }
+export async function putColumns(cols: Column[]) {
+  return putItemsToStore(COLUMNS_STORE, cols);
+}
+
+export async function putBoard(board: Board) {
+  return putItemsToStore(BOARDS_STORE, [board]);
+}
+
+export async function deleteColumn(colId: string) {
+  return deleteItemFromStore(COLUMNS_STORE, colId);
+}
+
+export async function deleteTasks(columnId: string) {
+  return deleteItemsByIndex(
+    TASKS_STORE,
+    INDEXES[TASKS_STORE].COLUMN_ID,
+    columnId
+  );
+}

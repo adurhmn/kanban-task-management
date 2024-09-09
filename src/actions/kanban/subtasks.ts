@@ -39,7 +39,7 @@ export const putSubtasksAction = (
 
     // optimistic updation
     setSubtasks(oldSubtasks, taskId);
-    KanbanService.putSubtasks(updatedSubtasks)
+    return KanbanService.putSubtasks(updatedSubtasks)
       .then(() => {
         const completedCount = oldSubtasks!.reduce(
           (acc, st) => acc + (st.isComplete ? 1 : 0),
@@ -50,7 +50,7 @@ export const putSubtasksAction = (
           ...task,
           subtask: { complete: completedCount, incomplete: incompleteCount },
         };
-        KanbanService.putTask(updatedTask).then(() => {
+        return KanbanService.putTask(updatedTask).then(() => {
           // non optimistic
           putTask(updatedTask);
         });
@@ -77,7 +77,7 @@ export const deleteSubtaskAction = (
   // optimistic updation
   const removedSubtask = deleteSubtask(subtaskId, taskId);
   if (task && removedSubtask) {
-    KanbanService.deleteSubtask(subtaskId)
+    return KanbanService.deleteSubtask(subtaskId)
       .then(() => {
         const updatedTask = {
           ...task,
@@ -90,7 +90,7 @@ export const deleteSubtaskAction = (
               task.subtask.incomplete - (!removedSubtask.isComplete ? 1 : 0),
           },
         };
-        KanbanService.putTask(updatedTask).then(() => {
+        return KanbanService.putTask(updatedTask).then(() => {
           // not optimistic
           putTask(updatedTask);
         });

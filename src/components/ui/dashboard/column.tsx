@@ -26,7 +26,7 @@ const Column = ({
   return (
     <div
       className={cn(
-        "min-w-[300px] p-[10px] flex flex-col ml-8 rounded-lg",
+        "min-w-[300px] p-[10px] flex flex-col ml-8 rounded-lg bg-cust-prim-light/10",
         snapshot.isDragging && "bg-blue-100"
       )}
       ref={provided.innerRef}
@@ -38,7 +38,7 @@ const Column = ({
           style={{ background: column.color || "transparent" }}
         />
         <h4 className="h4 text-cust-slate-300">{column.name}</h4>
-        <div {...provided.dragHandleProps}>
+        <div {...provided.dragHandleProps} className="ml-auto">
           <Grip className="size-8 text-cust-slate-300/60 hover:text-cust-slate-300 ml-auto" />
         </div>
       </div>
@@ -62,8 +62,8 @@ const Column = ({
                 </Draggable>
               ))
             ) : (
-              <div className="mt-10">
-                <p className="p1 text-center">No Tasks</p>
+              <div className="mt-10 mx-auto">
+                <p className="p2 text-center text-cust-slate-300">No Tasks</p>
               </div>
             )}
             {provided.placeholder}

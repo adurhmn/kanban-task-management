@@ -16,7 +16,7 @@ interface ColumnStore {
   columns: { [boardId: string]: Column[] } | null;
   addColumns: (column: Column[], boardId: string) => void;
   setColumns: (column: Column[], boardId: string) => void;
-  removeColumn: (colId: string, boardId: string) => void;
+  deleteColumn: (colId: string, boardId: string) => Column | null;
 }
 
 interface TaskStore {
@@ -64,7 +64,7 @@ const useBoardStore = create<BoardStore>((set) => ({
   setActiveBoard: (id) => set({ activeBoard: id }),
 }));
 
-const useColumnStore = create<ColumnStore>((set) => ({
+const useColumnStore = create<ColumnStore>((set, getStore) => ({
   columns: null,
   addColumns: (columns, boardId) => {
     set((state) => ({
@@ -84,7 +84,11 @@ const useColumnStore = create<ColumnStore>((set) => ({
       },
     }));
   },
-  removeColumn: (colId, boardId) =>
+  deleteColumn: (colId, boardId) => {
+    const colToRemove = getStore().columns?.[boardId]?.find(
+      (c) => c.id === colId
+    );
+
     set((state) => ({
       columns: state.columns
         ? {
@@ -93,7 +97,10 @@ const useColumnStore = create<ColumnStore>((set) => ({
               state.columns[boardId]?.filter((c) => c.id !== colId) || [],
           }
         : null,
-    })),
+    }));
+
+    return colToRemove ? colToRemove : null;
+  },
 }));
 
 const useTaskStore = create<TaskStore>((set, getStore) => ({
