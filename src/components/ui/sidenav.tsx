@@ -24,7 +24,7 @@ import {
 } from "@hello-pangea/dnd";
 import { DROPPABLE_TYPE } from "@/libs/constants/dnd";
 import { useBoardStore } from "@/store";
-import { addBoard, setActiveBoard } from "@/actions/kanban/boards";
+import { addBoard, setActiveBoardAction } from "@/actions/kanban/boards";
 
 function ThemeToggle() {
   return (
@@ -93,6 +93,7 @@ const CreateBtn = memo(() => {
           <div>
             <h4 className="p2 text-cust-slate-300 mb-2">Board Name</h4>
             <Input
+              autoFocus
               placeholder="e.g: Web Design"
               {...register("boardName", { required: "Board name requied" })}
               errMsg={errors["boardName"]?.message as string}
@@ -104,7 +105,6 @@ const CreateBtn = memo(() => {
               {cols.map((id, idx) => (
                 <div className="flex gap-3 items-center" key={id}>
                   <Input
-                    autoFocus={idx === cols.length - 1}
                     placeholder="e.g: Pending / Current / Completed"
                     {...register(id, { required: "Column name requied" })}
                     errMsg={errors[id]?.message as string}
@@ -235,7 +235,7 @@ export default function SideNav() {
                           key={b.id}
                           isActive={activeBoard === b.id}
                           onClick={() => {
-                            setActiveBoard(b.id);
+                            setActiveBoardAction(b.id);
                           }}
                           provided={provided}
                           snapshot={snapshot}

@@ -70,3 +70,23 @@ export const putColumnsAction = (updatedCols: Column[], boardId: string) => {
     });
   }
 };
+
+export const deleteColumnsAction = async (boardId: string) => {
+  const { columns: allCols, setColumns } = useColumnStore.getState();
+  const copy = allCols?.[boardId];
+
+  if (copy) {
+    //optimistic updation
+    setColumns([], boardId);
+    await KanbanService.deleteColumns(boardId)
+      .then(async () => {
+        for (const col of copy) {
+          await deleteTasksAction(col.id);
+        }
+        return "Columns Deletion Success";
+      })
+      .catch(() => {
+        setColumns(copy, boardId);
+      });
+  }
+};

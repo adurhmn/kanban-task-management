@@ -7,7 +7,7 @@ interface BoardStore {
   boards: Board[] | null;
   activeBoard: string;
   addBoard: (board: Board) => void;
-  removeBoard: (id: string) => void;
+  deleteBoard: (id: string) => Board | null;
   setBoards: (boards: Board[]) => void;
   setActiveBoard: (id: string) => void;
 }
@@ -36,22 +36,31 @@ interface SubtaskStore {
   deleteSubtask: (subtaskId: string, taskId: string) => Subtask | null;
 }
 
-const useBoardStore = create<BoardStore>((set) => ({
+const useBoardStore = create<BoardStore>((set, getStore) => ({
   boards: null,
   activeBoard: "",
   addBoard: (board) =>
     set(({ boards, activeBoard }) => ({
-      boards: boards ? [...boards, board] : [board],
+      boards: boards
+        ? [...boards, board].sort((a, b) => a.index - b.index)
+        : [board],
       activeBoard:
         activeBoard ||
         localStorage.getItem(LOCAL_KEYS.ACTIVE_BOARD) ||
         board.id ||
         "",
     })),
-  removeBoard: (id) =>
+  deleteBoard: (boardId) => {
+    const boardToRemove = getStore().boards?.find((b) => b.id === boardId);
+
     set((state) => ({
-      boards: state.boards ? state.boards.filter((b) => b.id !== id) : null,
-    })),
+      boards: state.boards
+        ? state.boards.filter((b) => b.id !== boardId)
+        : null,
+    }));
+
+    return boardToRemove ? boardToRemove : null;
+  },
   setBoards: (boards) =>
     set(({ activeBoard }) => ({
       boards,

@@ -3,19 +3,25 @@ import { useBoardStore, useColumnStore } from "@/store";
 import * as KanbanService from "@/services/kanban";
 import { LOCAL_KEYS } from "@/libs/constants";
 import { Board, Column } from "@/libs/types";
-import { deleteColumnAction, putColumnsAction } from "./columns";
+import {
+  deleteColumnAction,
+  deleteColumnsAction,
+  putColumnsAction,
+} from "./columns";
 
+// each action must await till all updates + sideeffects completion
+// then it should resolve with a success message
 export const addBoard = (name: string, columnNames?: string[]) => {
   const {
     boards,
     addBoard: addBoardToStore,
-    removeBoard: removeBoardFromStore,
+    deleteBoard: deleteBoardFromStore,
   } = useBoardStore.getState();
   const { addColumns: addColumnsToStore, deleteColumn: deleteColumnFromStore } =
     useColumnStore.getState();
   const lastIndex = boards ? boards.length - 1 : -1;
 
-  const board = createBoard(name, lastIndex);
+  const board = createBoard(name, lastIndex + 1);
   addBoardToStore(board); // optimistic updation
   return KanbanService.addBoard(board)
     .then(() => {
@@ -31,12 +37,12 @@ export const addBoard = (name: string, columnNames?: string[]) => {
     })
     .catch((err) => {
       console.log(err);
-      removeBoardFromStore(board.id);
+      deleteBoardFromStore(board.id);
       alert("Board Creation Failed");
     });
 };
 
-export const setActiveBoard = (id: string) => {
+export const setActiveBoardAction = (id: string) => {
   useBoardStore.getState().setActiveBoard(id);
   localStorage.setItem(LOCAL_KEYS.ACTIVE_BOARD, id);
 };
@@ -94,4 +100,82 @@ export const editBoardAction = async ({
 
   await putColumnsAction(colsToPut, board.id);
   await putBoardAction({ ...board, name });
+};
+
+export const putBoardsAction = (updatedBoards: Board[]) => {
+  let { boards: oldBoards, setBoards } = useBoardStore.getState();
+  const oldBoardsClone = oldBoards?.slice();
+
+  if (oldBoards) {
+    // merging the updated & new ones with old ones, then updating it to store
+    const oldBoardsMap = oldBoards.reduce((acc, cur) => {
+      acc[cur.id] = cur;
+      return acc;
+    }, {} as { [key: string]: Board });
+    const updatedBoardsMap = updatedBoards.reduce((acc, cur) => {
+      acc[cur.id] = cur;
+      return acc;
+    }, {} as { [key: string]: Board });
+    oldBoards = oldBoards.map((b) => updatedBoardsMap[b.id] || b); // updation
+    for (const b of updatedBoards) {
+      if (!oldBoardsMap[b.id]) {
+        oldBoards.push(b); // adding new ones
+      }
+    }
+    oldBoards = oldBoards?.sort((a, b) => a.index - b.index); // reordering indexes because of possible deletion
+
+    // optimistic updation
+    setBoards(oldBoards);
+    return KanbanService.updateBoards(updatedBoards).catch((err) => {
+      console.log({ err });
+      alert("Board update failed");
+      setBoards(oldBoardsClone!);
+    });
+  }
+};
+
+export const deleteBoardAction = async (boardId: string) => {
+  const { deleteBoard, addBoard, boards } = useBoardStore.getState();
+
+  // optimistic updation
+  const removedBoard = deleteBoard(boardId);
+  if (boards && removedBoard) {
+    // setting next active board
+    if (boards.length === 1) {
+      setActiveBoardAction("");
+    } else {
+      let nextActiveBoard: Board | undefined;
+      for (let i = 0; i < boards.length; i++) {
+        const b = boards[i];
+        if (b.id === boardId) {
+          if (boards[i + 1]) {
+            nextActiveBoard = boards[i + 1];
+          }
+          break;
+        } else {
+          nextActiveBoard = b;
+        }
+      }
+      setActiveBoardAction(nextActiveBoard?.id || "");
+    }
+
+    await KanbanService.deleteBoard(boardId)
+      .then(async () => {
+        await deleteColumnsAction(boardId);
+
+        // update board indexes
+        const boardsToUpdate: Board[] = [];
+        for (const board of boards) {
+          if (board.index > removedBoard.index) {
+            boardsToUpdate.push({ ...board, index: board.index - 1 });
+          }
+        }
+        putBoardsAction(boardsToUpdate);
+      })
+      .catch((err) => {
+        console.log({ err });
+        alert("Subtask delete failed");
+        addBoard(removedBoard);
+      });
+  }
 };

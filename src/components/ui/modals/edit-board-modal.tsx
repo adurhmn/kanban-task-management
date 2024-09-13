@@ -1,6 +1,12 @@
 import { editBoardAction } from "@/actions/kanban/boards";
 import IconCross from "@/assets/icons/cross";
-import { Button, Input, Modal } from "@/components/core";
+import {
+  Button,
+  DialogHeader,
+  DialogTitle,
+  Input,
+  Modal,
+} from "@/components/core";
 import { IModalProps } from "@/libs/types";
 import getRandId from "@/libs/utils/getRandId";
 import { useBoardStore, useColumnStore } from "@/store";
@@ -47,6 +53,9 @@ const EditBoardModal = ({
 
   return (
     <Modal showModal={showModal} setShowModal={setShowModal} onClose={onClose}>
+      <DialogHeader>
+        <DialogTitle>Edit Board</DialogTitle>
+      </DialogHeader>
       <form
         onSubmit={handleSubmit(handleCreate)}
         className="flex flex-col gap-5"
@@ -54,6 +63,7 @@ const EditBoardModal = ({
         <div>
           <h4 className="p2 text-cust-slate-300 mb-2">Board Name</h4>
           <Input
+            autoFocus
             placeholder="e.g: Web Design"
             {...register("name", { required: "Board name requied" })}
             errMsg={errors["name"]?.message as string}
@@ -65,7 +75,6 @@ const EditBoardModal = ({
             {cols.map((id, idx) => (
               <div className="flex gap-3 items-center" key={id}>
                 <Input
-                  autoFocus={idx === cols.length - 1}
                   placeholder="e.g: Pending / Current / Completed"
                   {...register(id, { required: "Column name requied" })}
                   errMsg={errors[id]?.message as string}

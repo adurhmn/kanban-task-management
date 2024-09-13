@@ -103,7 +103,7 @@ export const deleteSubtaskAction = (
   }
 };
 
-export const deleteSubtasksAction = (taskId: string) => {
+export const deleteSubtasksAction = async (taskId: string) => {
   const { setSubtasks, subtasks } = useSubtaskStore.getState();
   const copy = subtasks?.[taskId];
 
@@ -111,9 +111,10 @@ export const deleteSubtasksAction = (taskId: string) => {
     // optimistic updation
     setSubtasks([], taskId);
 
-    KanbanService.deleteSubtasks(taskId)
+    await KanbanService.deleteSubtasks(taskId)
       .then(() => {
         // task will be deleted, no need to update count
+        return "Subtasks Deletion Success";
       })
       .catch((err) => {
         console.log({ err });

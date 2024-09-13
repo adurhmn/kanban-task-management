@@ -169,6 +169,7 @@ const EditTaskContent = ({
         <div>
           <h4 className="p2 text-cust-slate-300 mb-2">Description</h4>
           <Input
+            autoFocus
             placeholder="e.g: Build a rocket that can fly to other galaxies and make contact with aliens."
             {...register("desc", { required: "Description requied" })}
             errMsg={errors["desc"]?.message as string}
@@ -180,7 +181,6 @@ const EditTaskContent = ({
             {subtasks.map((id, idx) => (
               <div className="flex gap-3 items-center" key={id}>
                 <Input
-                  autoFocus={idx === subtasks.length - 1}
                   placeholder="e.g: Learn rocket science, call Elon Musk for help"
                   {...register(id, { required: "Requied" })}
                   errMsg={errors[id]?.message as string}

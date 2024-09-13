@@ -107,10 +107,22 @@ export async function deleteColumn(colId: string) {
   return deleteItemFromStore(COLUMNS_STORE, colId);
 }
 
+export async function deleteColumns(boardId: string) {
+  return deleteItemsByIndex(
+    COLUMNS_STORE,
+    INDEXES[COLUMNS_STORE].BOARD_ID,
+    boardId
+  );
+}
+
 export async function deleteTasks(columnId: string) {
   return deleteItemsByIndex(
     TASKS_STORE,
     INDEXES[TASKS_STORE].COLUMN_ID,
     columnId
   );
+}
+
+export async function deleteBoard(boardId: string) {
+  return deleteItemFromStore(BOARDS_STORE, boardId);
 }

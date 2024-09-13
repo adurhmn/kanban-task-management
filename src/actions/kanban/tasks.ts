@@ -191,7 +191,7 @@ export const deleteTaskAction = (taskId: string, colId: string) => {
   }
 };
 
-export const deleteTasksAction = (colId: string) => {
+export const deleteTasksAction = async (colId: string) => {
   const { setTasks, tasks } = useTaskStore.getState();
   const copy = tasks?.[colId];
 
@@ -199,12 +199,13 @@ export const deleteTasksAction = (colId: string) => {
     // optimistic updation
     setTasks([], colId);
 
-    KanbanService.deleteTasks(colId)
-      .then(() => {
+    await KanbanService.deleteTasks(colId)
+      .then(async () => {
         for (const task of copy) {
-          deleteSubtasksAction(task.id);
+          await deleteSubtasksAction(task.id);
         }
       })
+      .then(() => "Tasks Deletion Success")
       .catch((err) => {
         console.log({ err });
         alert("Task delete failed");

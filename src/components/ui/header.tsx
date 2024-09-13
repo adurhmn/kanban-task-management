@@ -5,6 +5,9 @@ import {
   Button,
   DialogHeader,
   Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Select,
   SelectContent,
   SelectGroup,
@@ -21,9 +24,45 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/core";
-import { Plus } from "lucide-react";
-import { memo, useCallback, useState } from "react";
+import { EllipsisVertical, Plus } from "lucide-react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useEditBoardModal } from "./modals/edit-board-modal";
+import { useDeleteBoardModal } from "./modals/delete-board-modal";
+
+const BoardActions = ({
+  activateEditMode,
+  activateDeleteMode,
+}: {
+  activateEditMode: () => void;
+  activateDeleteMode: () => void;
+}) => {
+  return (
+    <>
+      <Popover>
+        <PopoverTrigger asChild>
+          <EllipsisVertical className="cursor-pointer ml-2" />
+        </PopoverTrigger>
+        <PopoverContent className="w-32 p-0 border-none">
+          <div className="grid bg-white rounded-md">
+            <button
+              className="text-center p-4 py-2 w-full hover:bg-slate-100 transition-colors rounded-md p1"
+              onClick={activateEditMode}
+            >
+              Edit Board
+            </button>
+            <button
+              className="text-center p-4 py-2 w-full hover:bg-red-100 transition-colors rounded-md p1 text-cust-destructive"
+              onClick={activateDeleteMode}
+            >
+              Delete Board
+            </button>
+          </div>
+        </PopoverContent>
+      </Popover>
+    </>
+  );
+};
 
 const AddTaskButton = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
@@ -95,6 +134,7 @@ const AddTaskButton = memo(() => {
           <div>
             <h4 className="p2 text-cust-slate-300 mb-2">Description</h4>
             <Input
+              autoFocus
               placeholder="e.g: Build a rocket that can fly to other galaxies and make contact with aliens."
               {...register("desc", { required: "Description requied" })}
               errMsg={errors["desc"]?.message as string}
@@ -106,7 +146,6 @@ const AddTaskButton = memo(() => {
               {subtasks.map((id, idx) => (
                 <div className="flex gap-3 items-center" key={id}>
                   <Input
-                    autoFocus={idx === subtasks.length - 1}
                     placeholder="e.g: Learn rocket science, call Elon Musk for help"
                     {...register(id, { required: "Requied" })}
                     errMsg={errors[id]?.message as string}
@@ -186,15 +225,33 @@ const AddTaskButton = memo(() => {
 });
 
 export default function Header() {
+  const { setShowEditBoardModal, EditBoardModal } = useEditBoardModal();
+  const { setShowDeleteBoardModal, DeleteBoardModal } = useDeleteBoardModal();
+  const { activeBoard, boards } = useBoardStore();
+  const board = useMemo(
+    () => boards?.find((b) => b.id === activeBoard),
+    [activeBoard, boards]
+  );
+
   return (
     <div className="flex items-center h-[80px]">
       <div className="w-[300px] h-full flex items-center justify-center border-cust-slate-200 border-b border-r flex-shrink-0">
         <img src={imgLogoDark} />
       </div>
       <div className="border-b border-cust-slate-200 flex items-center flex-grow h-full py-4 px-7">
-        <h1 className="h1 mr-auto">Platform Launch</h1>
+        <h1 className="h1 mr-auto">{board?.name}</h1>
         <AddTaskButton />
+        <BoardActions
+          activateEditMode={() => {
+            setShowEditBoardModal(true);
+          }}
+          activateDeleteMode={() => {
+            setShowDeleteBoardModal(true);
+          }}
+        />
       </div>
+      <EditBoardModal />
+      <DeleteBoardModal />
     </div>
   );
 }
