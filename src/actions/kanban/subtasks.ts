@@ -3,7 +3,7 @@ import * as KanbanService from "@/services/kanban";
 import { useSubtaskStore, useTaskStore } from "@/store";
 
 // Partial<Subtask> can be received if merging is handled in idb put service
-export const putSubtasksAction = (
+export const putSubtasksAction = async (
   updatedSubtasks: Subtask[],
   taskId: string,
   colId: string
@@ -39,8 +39,8 @@ export const putSubtasksAction = (
 
     // optimistic updation
     setSubtasks(oldSubtasks, taskId);
-    return KanbanService.putSubtasks(updatedSubtasks)
-      .then(() => {
+    return await KanbanService.putSubtasks(updatedSubtasks)
+      .then(async () => {
         const completedCount = oldSubtasks!.reduce(
           (acc, st) => acc + (st.isComplete ? 1 : 0),
           0
@@ -50,9 +50,10 @@ export const putSubtasksAction = (
           ...task,
           subtask: { complete: completedCount, incomplete: incompleteCount },
         };
-        return KanbanService.putTask(updatedTask).then(() => {
+        return await KanbanService.putTask(updatedTask).then(() => {
           // non optimistic
           putTask(updatedTask);
+          return "putSubtasksAction success";
         });
       })
       .catch((err) => {
@@ -63,7 +64,7 @@ export const putSubtasksAction = (
   }
 };
 
-export const deleteSubtaskAction = (
+export const deleteSubtaskAction = async (
   subtaskId: string,
   taskId: string,
   colId: string
@@ -77,8 +78,8 @@ export const deleteSubtaskAction = (
   // optimistic updation
   const removedSubtask = deleteSubtask(subtaskId, taskId);
   if (task && removedSubtask) {
-    return KanbanService.deleteSubtask(subtaskId)
-      .then(() => {
+    return await KanbanService.deleteSubtask(subtaskId)
+      .then(async () => {
         const updatedTask = {
           ...task,
           subtask: {
@@ -90,9 +91,10 @@ export const deleteSubtaskAction = (
               task.subtask.incomplete - (!removedSubtask.isComplete ? 1 : 0),
           },
         };
-        return KanbanService.putTask(updatedTask).then(() => {
+        return await KanbanService.putTask(updatedTask).then(() => {
           // not optimistic
           putTask(updatedTask);
+          return "deleteSubtaskAction success";
         });
       })
       .catch((err) => {
@@ -111,15 +113,14 @@ export const deleteSubtasksAction = async (taskId: string) => {
     // optimistic updation
     setSubtasks([], taskId);
 
-    await KanbanService.deleteSubtasks(taskId)
+    return await KanbanService.deleteSubtasks(taskId)
       .then(() => {
         // task will be deleted, no need to update count
-        return "Subtasks Deletion Success";
+        return "deleteSubtasksAction Success";
       })
       .catch((err) => {
         console.log({ err });
         alert("Subtask delete failed");
-        console.log({ copy });
         setSubtasks(copy, taskId);
       });
   }

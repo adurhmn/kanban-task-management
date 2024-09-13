@@ -11,7 +11,7 @@ import {
 
 // each action must await till all updates + sideeffects completion
 // then it should resolve with a success message
-export const addBoard = (name: string, columnNames?: string[]) => {
+export const addBoardAction = async (name: string, columnNames?: string[]) => {
   const {
     boards,
     addBoard: addBoardToStore,
@@ -23,17 +23,24 @@ export const addBoard = (name: string, columnNames?: string[]) => {
 
   const board = createBoard(name, lastIndex + 1);
   addBoardToStore(board); // optimistic updation
-  return KanbanService.addBoard(board)
-    .then(() => {
-      columnNames?.forEach((name, index) => {
-        const column = createColumn({ name, boardId: board.id, index });
-        addColumnsToStore([column], board.id);
-        KanbanService.addColumn(column).catch((err) => {
-          console.log(err);
-          deleteColumnFromStore(column.id, board.id);
-          alert("Column creation Failed");
-        });
-      });
+  return await KanbanService.addBoard(board)
+    .then(async () => {
+      if (columnNames) {
+        for (let i = 0; i < columnNames.length; i++) {
+          const column = createColumn({
+            name: columnNames[i],
+            boardId: board.id,
+            index: i,
+          });
+          addColumnsToStore([column], board.id);
+          await KanbanService.addColumn(column).catch((err) => {
+            console.log(err);
+            deleteColumnFromStore(column.id, board.id);
+            alert("Column creation Failed");
+          });
+        }
+      }
+      return "addBoard success";
     })
     .catch((err) => {
       console.log(err);
@@ -47,17 +54,53 @@ export const setActiveBoardAction = (id: string) => {
   localStorage.setItem(LOCAL_KEYS.ACTIVE_BOARD, id);
 };
 
-export const putBoardAction = (updatedBoard: Board) => {
+export const putBoardAction = async (updatedBoard: Board) => {
   const { boards, setBoards } = useBoardStore.getState();
 
   if (boards) {
     // optimistic updation
     setBoards(boards.map((b) => (b.id === updatedBoard.id ? updatedBoard : b)));
-    return KanbanService.putBoard(updatedBoard).catch((err) => {
-      console.log({ err });
-      alert("Subtask update failed");
-      setBoards(boards);
-    });
+    return await KanbanService.putBoard(updatedBoard)
+      .then(() => "putBoardAction success")
+      .catch((err) => {
+        console.log({ err });
+        alert("Subtask update failed");
+        setBoards(boards);
+      });
+  }
+};
+
+export const putBoardsAction = async (updatedBoards: Board[]) => {
+  let { boards: oldBoards, setBoards } = useBoardStore.getState();
+  const oldBoardsClone = oldBoards?.slice();
+
+  if (oldBoards) {
+    // merging the updated & new ones with old ones, then updating it to store
+    const oldBoardsMap = oldBoards.reduce((acc, cur) => {
+      acc[cur.id] = cur;
+      return acc;
+    }, {} as { [key: string]: Board });
+    const updatedBoardsMap = updatedBoards.reduce((acc, cur) => {
+      acc[cur.id] = cur;
+      return acc;
+    }, {} as { [key: string]: Board });
+    oldBoards = oldBoards.map((b) => updatedBoardsMap[b.id] || b); // updation
+    for (const b of updatedBoards) {
+      if (!oldBoardsMap[b.id]) {
+        oldBoards.push(b); // adding new ones
+      }
+    }
+    oldBoards = oldBoards?.sort((a, b) => a.index - b.index); // reordering indexes because of possible deletion
+
+    // optimistic updation
+    setBoards(oldBoards);
+    return await KanbanService.updateBoards(updatedBoards)
+      .then(() => "putBoardsAction success")
+      .catch((err) => {
+        console.log({ err });
+        alert("Board update failed");
+        setBoards(oldBoardsClone!);
+      });
   }
 };
 
@@ -98,40 +141,9 @@ export const editBoardAction = async ({
     }
   });
 
-  await putColumnsAction(colsToPut, board.id);
-  await putBoardAction({ ...board, name });
-};
-
-export const putBoardsAction = (updatedBoards: Board[]) => {
-  let { boards: oldBoards, setBoards } = useBoardStore.getState();
-  const oldBoardsClone = oldBoards?.slice();
-
-  if (oldBoards) {
-    // merging the updated & new ones with old ones, then updating it to store
-    const oldBoardsMap = oldBoards.reduce((acc, cur) => {
-      acc[cur.id] = cur;
-      return acc;
-    }, {} as { [key: string]: Board });
-    const updatedBoardsMap = updatedBoards.reduce((acc, cur) => {
-      acc[cur.id] = cur;
-      return acc;
-    }, {} as { [key: string]: Board });
-    oldBoards = oldBoards.map((b) => updatedBoardsMap[b.id] || b); // updation
-    for (const b of updatedBoards) {
-      if (!oldBoardsMap[b.id]) {
-        oldBoards.push(b); // adding new ones
-      }
-    }
-    oldBoards = oldBoards?.sort((a, b) => a.index - b.index); // reordering indexes because of possible deletion
-
-    // optimistic updation
-    setBoards(oldBoards);
-    return KanbanService.updateBoards(updatedBoards).catch((err) => {
-      console.log({ err });
-      alert("Board update failed");
-      setBoards(oldBoardsClone!);
-    });
-  }
+  await putBoardAction({ ...board, name }); 
+  await putColumnsAction(colsToPut, board.id); 
+  return "editBoardAction success";
 };
 
 export const deleteBoardAction = async (boardId: string) => {
@@ -159,7 +171,7 @@ export const deleteBoardAction = async (boardId: string) => {
       setActiveBoardAction(nextActiveBoard?.id || "");
     }
 
-    await KanbanService.deleteBoard(boardId)
+    return await KanbanService.deleteBoard(boardId)
       .then(async () => {
         await deleteColumnsAction(boardId);
 
@@ -170,7 +182,8 @@ export const deleteBoardAction = async (boardId: string) => {
             boardsToUpdate.push({ ...board, index: board.index - 1 });
           }
         }
-        putBoardsAction(boardsToUpdate);
+        await putBoardsAction(boardsToUpdate);
+        return "deleteBoardAction success";
       })
       .catch((err) => {
         console.log({ err });

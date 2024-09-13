@@ -87,9 +87,15 @@ const AddTaskButton = memo(() => {
 
   const handleCreate = useCallback(
     ({ title, desc, colId, ...subtasks }: any) => {
-      addTaskAction({ title, desc, colId, subtasks: Object.values(subtasks) });
-      reset();
-      setIsOpen(false);
+      addTaskAction({
+        title,
+        desc,
+        colId,
+        subtasks: Object.values(subtasks),
+      }).then(() => {
+        reset();
+        setIsOpen(false);
+      });
     },
     []
   );

@@ -3,7 +3,7 @@ import { useColumnStore } from "@/store";
 import * as KanbanService from "@/services/kanban";
 import { deleteTasksAction } from "./tasks";
 
-export const deleteColumnAction = (colId: string, boardId: string) => {
+export const deleteColumnAction = async (colId: string, boardId: string) => {
   const {
     deleteColumn,
     addColumns,
@@ -14,9 +14,9 @@ export const deleteColumnAction = (colId: string, boardId: string) => {
   // optimistic updation
   const removedColumn = deleteColumn(colId, boardId);
   if (removedColumn) {
-    return KanbanService.deleteColumn(colId)
-      .then(() => {
-        deleteTasksAction(colId);
+    return await KanbanService.deleteColumn(colId)
+      .then(async () => {
+        await deleteTasksAction(colId);
         // update col indexes
         const colsToUpdate: Column[] = [];
         for (const col of cols) {
@@ -24,7 +24,8 @@ export const deleteColumnAction = (colId: string, boardId: string) => {
             colsToUpdate.push({ ...col, index: col.index - 1 });
           }
         }
-        return putColumnsAction(colsToUpdate, boardId);
+        await putColumnsAction(colsToUpdate, boardId);
+        return "deleteColumnAction success";
       })
       .catch((err) => {
         console.log({ err });
@@ -35,7 +36,10 @@ export const deleteColumnAction = (colId: string, boardId: string) => {
 };
 
 // Partial<Column> can be received if merging is handled in idb put service
-export const putColumnsAction = (updatedCols: Column[], boardId: string) => {
+export const putColumnsAction = async (
+  updatedCols: Column[],
+  boardId: string
+) => {
   // updatedCols -> can have items to update as well as new items
   //                 -> doesn't necessarily need to contain all old items, only the updated + new ones
   //                 -> so, we need to merge with oldCols
@@ -63,11 +67,13 @@ export const putColumnsAction = (updatedCols: Column[], boardId: string) => {
 
     // optimistic updation
     setColumns(oldCols, boardId);
-    return KanbanService.putColumns(updatedCols).catch((err) => {
-      console.log({ err });
-      alert("Column update failed");
-      setColumns(oldColsClone!, boardId);
-    });
+    return await KanbanService.putColumns(updatedCols)
+      .then(() => "putColumnsAction success")
+      .catch((err) => {
+        console.log({ err });
+        alert("Column update failed");
+        setColumns(oldColsClone!, boardId);
+      });
   }
 };
 
@@ -78,12 +84,12 @@ export const deleteColumnsAction = async (boardId: string) => {
   if (copy) {
     //optimistic updation
     setColumns([], boardId);
-    await KanbanService.deleteColumns(boardId)
+    return await KanbanService.deleteColumns(boardId)
       .then(async () => {
         for (const col of copy) {
           await deleteTasksAction(col.id);
         }
-        return "Columns Deletion Success";
+        return "deleteColumnsAction Success";
       })
       .catch(() => {
         setColumns(copy, boardId);

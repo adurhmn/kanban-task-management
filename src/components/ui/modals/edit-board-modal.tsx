@@ -46,9 +46,11 @@ const EditBoardModal = ({
   );
 
   const handleCreate = useCallback((formData: any) => {
-    console.log({ formData });
-    editBoardAction({ board: board!, oldColumns: oldCols, formData });
-    setShowModal(false);
+    editBoardAction({ board: board!, oldColumns: oldCols, formData }).then(
+      () => {
+        setShowModal(false);
+      }
+    );
   }, []);
 
   return (

@@ -145,8 +145,9 @@ const EditTaskContent = ({
   );
 
   const handleUpdate = useCallback((formData: any) => {
-    editTaskAction({ task, oldSubtasks, formData });
-    activateViewMode();
+    editTaskAction({ task, oldSubtasks, formData }).then(() => {
+      activateViewMode();
+    });
   }, []);
 
   return (
@@ -288,8 +289,9 @@ const DeleteTaskContent = ({
   onDelete: () => void;
 }) => {
   const handleDelete = () => {
-    deleteTaskAction(task.id, task.columnId);
-    onDelete();
+    deleteTaskAction(task.id, task.columnId).then(() => {
+      onDelete();
+    });
   };
 
   return task ? (

@@ -8,7 +8,7 @@ import {
   putSubtasksAction,
 } from "./subtasks";
 
-export const addTaskAction = ({
+export const addTaskAction = async ({
   title,
   desc,
   subtasks,
@@ -39,17 +39,25 @@ export const addTaskAction = ({
   });
 
   addTasksToStore([task], colId); // optimistic updation
-  KanbanService.addTask(task)
-    .then(() => {
-      subtasks?.forEach((desc, index) => {
-        const subtask = createSubtask({ desc, taskId: task.id, index });
-        addSubtasksToStore([subtask], task.id);
-        KanbanService.addSubtask(subtask).catch((err) => {
-          console.log(err);
-          deleteSubtaskFromStore(subtask.id, task.id);
-          alert("Subtask creation Failed");
-        });
-      });
+  return await KanbanService.addTask(task)
+    .then(async () => {
+      if (subtasks) {
+        for (let i = 0; i < subtasks.length; i++) {
+          const subtask = createSubtask({
+            desc: subtasks[i],
+            taskId: task.id,
+            index: i,
+          });
+          addSubtasksToStore([subtask], task.id);
+          await KanbanService.addSubtask(subtask).catch((err) => {
+            console.log(err);
+            deleteSubtaskFromStore(subtask.id, task.id);
+            alert("Subtask creation Failed");
+          });
+        }
+      }
+
+      return "Task creation success";
     })
     .catch((err) => {
       console.log(err);
@@ -60,7 +68,7 @@ export const addTaskAction = ({
 
 // colId & id should not change
 // colId can only be changed through dnd where index is recalculated
-export const putTaskAction = (updatedTask: Task) => {
+export const putTaskAction = async (updatedTask: Task) => {
   const { tasks: allOldTasks, setTasks } = useTaskStore.getState();
   const oldTasks = allOldTasks?.[updatedTask.columnId];
 
@@ -70,16 +78,18 @@ export const putTaskAction = (updatedTask: Task) => {
       oldTasks.map((st) => (st.id === updatedTask.id ? updatedTask : st)),
       updatedTask.columnId
     );
-    return KanbanService.putTask(updatedTask).catch((err) => {
-      console.log({ err });
-      alert("Subtask update failed");
-      setTasks(oldTasks, updatedTask.columnId);
-    });
+    return await KanbanService.putTask(updatedTask)
+      .then(() => "putTaskAction success")
+      .catch((err) => {
+        console.log({ err });
+        alert("Subtask update failed");
+        setTasks(oldTasks, updatedTask.columnId);
+      });
   }
 };
 
 // Partial<Task> can be received if merging is handled in idb put service
-export const putTasksAction = (updatedTasks: Task[], colId: string) => {
+export const putTasksAction = async (updatedTasks: Task[], colId: string) => {
   // updatedTasks -> can have items to update as well as new items
   //                 -> doesn't necessarily need to contain all old items, only the updated + new ones
   //                 -> so, we need to merge new with old data
@@ -107,11 +117,13 @@ export const putTasksAction = (updatedTasks: Task[], colId: string) => {
 
     // optimistic updation
     setTasks(oldTasks, colId);
-    KanbanService.putTasks(updatedTasks).catch((err) => {
-      console.log({ err });
-      alert("Task update failed");
-      setTasks(oldTasksClone!, colId);
-    });
+    return await KanbanService.putTasks(updatedTasks)
+      .then(() => "putTasksAction success")
+      .catch((err) => {
+        console.log({ err });
+        alert("Task update failed");
+        setTasks(oldTasksClone!, colId);
+      });
   }
 };
 
@@ -160,20 +172,21 @@ export const editTaskAction = async ({
     }
   });
 
-  await putSubtasksAction(subtasksToPut, task.id, task.columnId);
-  await putTaskAction({ ...task, title, desc, status });
+  await putTaskAction({ ...task, title, desc, status }); // order should not changes
+  await putSubtasksAction(subtasksToPut, task.id, task.columnId); // order should not changes
+  return "editTaskAction success";
 };
 
-export const deleteTaskAction = (taskId: string, colId: string) => {
+export const deleteTaskAction = async (taskId: string, colId: string) => {
   const { deleteTask, addTasks, tasks: allTasks } = useTaskStore.getState();
   const tasks = allTasks![colId];
 
   // optimistic updation
   const removedTask = deleteTask(taskId, colId);
   if (removedTask) {
-    KanbanService.deleteTask(taskId)
-      .then(() => {
-        deleteSubtasksAction(taskId);
+    return await KanbanService.deleteTask(taskId)
+      .then(async () => {
+        await deleteSubtasksAction(taskId);
         // update task indexes
         const tasksToUpdate: Task[] = [];
         for (const task of tasks) {
@@ -181,7 +194,8 @@ export const deleteTaskAction = (taskId: string, colId: string) => {
             tasksToUpdate.push({ ...task, index: task.index - 1 });
           }
         }
-        putTasksAction(tasksToUpdate, colId);
+        await putTasksAction(tasksToUpdate, colId);
+        return "deleteTaskAction success";
       })
       .catch((err) => {
         console.log({ err });
@@ -199,13 +213,13 @@ export const deleteTasksAction = async (colId: string) => {
     // optimistic updation
     setTasks([], colId);
 
-    await KanbanService.deleteTasks(colId)
+    return await KanbanService.deleteTasks(colId)
       .then(async () => {
         for (const task of copy) {
           await deleteSubtasksAction(task.id);
         }
+        return "deleteTasksAction success";
       })
-      .then(() => "Tasks Deletion Success")
       .catch((err) => {
         console.log({ err });
         alert("Task delete failed");

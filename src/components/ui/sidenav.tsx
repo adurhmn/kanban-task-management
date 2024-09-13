@@ -24,7 +24,7 @@ import {
 } from "@hello-pangea/dnd";
 import { DROPPABLE_TYPE } from "@/libs/constants/dnd";
 import { useBoardStore } from "@/store";
-import { addBoard, setActiveBoardAction } from "@/actions/kanban/boards";
+import { addBoardAction, setActiveBoardAction } from "@/actions/kanban/boards";
 
 function ThemeToggle() {
   return (
@@ -53,9 +53,10 @@ const CreateBtn = memo(() => {
   }, []);
 
   const handleCreate = useCallback(({ boardName, ...colNames }: any) => {
-    addBoard(boardName, Object.values(colNames));
-    reset();
-    setIsOpen(false);
+    addBoardAction(boardName, Object.values(colNames)).then(() => {
+      reset();
+      setIsOpen(false);
+    });
   }, []);
 
   return (
