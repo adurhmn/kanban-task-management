@@ -9,6 +9,7 @@ export const Modal = ({
   preventDefaultClose,
   hideCloseBtn,
 }: IModalProps) => {
+
   const closeModal = () => {
     if (!preventDefaultClose) {
       setShowModal(false);

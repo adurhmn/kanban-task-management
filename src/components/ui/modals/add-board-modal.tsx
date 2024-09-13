@@ -1,4 +1,4 @@
-import { editBoardAction } from "@/actions/kanban/boards";
+import { addBoardAction } from "@/actions/kanban/boards";
 import IconCross from "@/assets/icons/cross";
 import {
   Button,
@@ -9,54 +9,41 @@ import {
 } from "@/components/core";
 import { IModalProps } from "@/libs/types";
 import getRandId from "@/libs/utils/getRandId";
-import { useBoardStore, useColumnStore } from "@/store";
 import { Plus } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 
-const EditBoardModal = ({
-  boardId,
+const AddBoardModal = ({
   showModal,
   setShowModal,
   onClose,
-}: { boardId: string } & Omit<IModalProps, "children">) => {
-  const { boards: allBoards } = useBoardStore();
-  const board = allBoards?.find((b) => b.id === boardId);
-  const { columns: allColumns } = useColumnStore();
-  const oldCols = allColumns?.[boardId] || [];
-
+}: Omit<IModalProps, "children">) => {
   const {
     register,
     unregister,
     formState: { errors },
     handleSubmit,
-    // reset: resetForm,
-  } = useForm<{ name: string; [key: string]: string }>({
-    defaultValues: {
-      name: board?.name,
-      ...oldCols.reduce((acc, st) => {
-        acc[st.id] = st.name;
-        return acc;
-      }, {} as { [id: string]: string }),
-    },
-  });
+    reset: resetForm,
+  } = useForm();
 
-  const [cols, setCols] = useState(
-    oldCols.length ? oldCols.map((c) => c.id) : [`col-${getRandId()}`]
-  );
+  const [cols, setCols] = useState([`col-${getRandId()}`]);
 
-  const handleCreate = useCallback((formData: any) => {
-    editBoardAction({ board: board!, oldColumns: oldCols, formData }).then(
-      () => {
-        setShowModal(false);
-      }
-    );
+  const reset = useCallback(() => {
+    setCols([`col-${getRandId()}`]);
+    resetForm();
+  }, []);
+
+  const handleCreate = useCallback(({ boardName, ...colNames }: any) => {
+    addBoardAction(boardName, Object.values(colNames)).then(() => {
+      reset();
+      setShowModal(false);
+    });
   }, []);
 
   return (
     <Modal showModal={showModal} setShowModal={setShowModal} onClose={onClose}>
       <DialogHeader>
-        <DialogTitle>Edit Board</DialogTitle>
+        <DialogTitle>Add New Board</DialogTitle>
       </DialogHeader>
       <form
         onSubmit={handleSubmit(handleCreate)}
@@ -67,14 +54,14 @@ const EditBoardModal = ({
           <Input
             autoFocus
             placeholder="e.g: Web Design"
-            {...register("name", { required: "Board name requied" })}
-            errMsg={errors["name"]?.message as string}
+            {...register("boardName", { required: "Board name requied" })}
+            errMsg={errors["boardName"]?.message as string}
           />
         </div>
         <div>
           <h4 className="p2 text-cust-slate-300 mb-2">{`Board Columns (${cols.length})`}</h4>
           <div className="flex flex-col gap-3">
-            {cols.map((id, idx) => (
+            {cols.map((id) => (
               <div className="flex gap-3 items-center" key={id}>
                 <Input
                   placeholder="e.g: Pending / Current / Completed"
@@ -108,45 +95,33 @@ const EditBoardModal = ({
             </Button>
           </div>
         </div>
-        <div className="flex gap-3">
-          <Button
-            variant={"secondary"}
-            type="button"
-            className="w-full flex-shrink flex gap-2 items-center"
-            onClick={() => setShowModal(false)}
-          >
-            <p className={"p1 whitespace-nowrap text-cust-prim"}>Cancel</p>
-          </Button>
-          <Button type="submit" className="w-full flex-shrink">
-            <p className="p1">Save Changes</p>
-          </Button>
-        </div>
+        <Button type="submit" className="w-full">
+          <p className="p1">Add New Board</p>
+        </Button>
       </form>
     </Modal>
   );
 };
 
-const useEditBoardModal = () => {
-  const { activeBoard } = useBoardStore();
-  const [showEditBoardModal, setShowEditBoardModal] = useState(false);
+const useAddBoardModal = () => {
+  const [showAddBoardModal, setShowAddBoardModal] = useState(false);
 
-  const EditBoardModalCallback = useCallback(() => {
+  const AddBoardModalCallback = useCallback(() => {
     return (
-      <EditBoardModal
-        boardId={activeBoard}
-        showModal={!!activeBoard && showEditBoardModal}
-        setShowModal={setShowEditBoardModal}
+      <AddBoardModal
+        showModal={showAddBoardModal}
+        setShowModal={setShowAddBoardModal}
       />
     );
-  }, [activeBoard, showEditBoardModal]);
+  }, [showAddBoardModal]);
 
   return useMemo(
     () => ({
-      setShowEditBoardModal,
-      EditBoardModal: EditBoardModalCallback,
+      setShowAddBoardModal,
+      AddBoardModal: AddBoardModalCallback,
     }),
-    [EditBoardModalCallback]
+    [AddBoardModalCallback]
   );
 };
 
-export { EditBoardModal, useEditBoardModal };
+export { AddBoardModal, useAddBoardModal };
