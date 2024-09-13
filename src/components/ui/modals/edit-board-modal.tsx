@@ -91,7 +91,7 @@ const EditBoardModal = ({
                     })
                   }
                 >
-                  <IconCross />
+                  <IconCross className="hover:fill-red-500"/>
                 </button>
               </div>
             ))}

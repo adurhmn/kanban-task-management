@@ -23,7 +23,11 @@ import getRandId from "@/libs/utils/getRandId";
 import IconCross from "@/assets/icons/cross";
 import { Subtask as ISubtask, Task, TaskStatus } from "@/libs/types";
 import cn from "@/libs/utils/cn";
-import { deleteTaskAction, editTaskAction } from "@/actions/kanban/tasks";
+import {
+  deleteTaskAction,
+  editTaskAction,
+  putTaskAction,
+} from "@/actions/kanban/tasks";
 
 const TaskActions = ({
   onDelete,
@@ -107,6 +111,38 @@ const ViewTaskContent = ({
           ))}
         </div>
       )}
+      <div>
+        <h4 className="p2 text-cust-slate-300 mb-2">Status</h4>
+        <Select
+          value={task.status}
+          onValueChange={(v) =>
+            putTaskAction({ ...task, status: v as TaskStatus })
+          }
+        >
+          <SelectTrigger className={cn("w-full")}>
+            <SelectValue placeholder="Column" />
+          </SelectTrigger>
+          <SelectContent className="bg-white">
+            <SelectGroup>
+              <SelectItem value={TaskStatus.HOLD} key={TaskStatus.HOLD}>
+                Hold
+              </SelectItem>
+              <SelectItem
+                value={TaskStatus.ON_PROGRESS}
+                key={TaskStatus.ON_PROGRESS}
+              >
+                On Progress
+              </SelectItem>
+              <SelectItem
+                value={TaskStatus.COMPLETED}
+                key={TaskStatus.COMPLETED}
+              >
+                Completed
+              </SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   ) : null;
 };
@@ -187,7 +223,7 @@ const EditTaskContent = ({
                   errMsg={errors[id]?.message as string}
                 />
                 <button
-                  className="mx-2 disabled:opacity-50"
+                  className="mx-2 disabled:opacity-50 group"
                   onClick={() =>
                     setSubtasks((prev) => {
                       unregister(id);
@@ -195,7 +231,7 @@ const EditTaskContent = ({
                     })
                   }
                 >
-                  <IconCross />
+                  <IconCross className="group-hover:fill-red-500"/>
                 </button>
               </div>
             ))}
@@ -356,7 +392,7 @@ const TaskModal = () => {
   }, [activeTask, setShowModal]);
 
   return (
-    <Modal showModal={showModal} setShowModal={setShowModal} onClose={onClose}>
+    <Modal showModal={showModal} setShowModal={setShowModal} onClose={onClose} hideCloseBtn>
       {mode === ModalModes.VIEW && task && (
         <ViewTaskContent
           task={task}

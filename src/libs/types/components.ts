@@ -3,5 +3,6 @@ export interface IModalProps {
   showModal: boolean;
   setShowModal: (show: boolean) => void;
   onClose?: () => void;
-  preventDefaultClose?: boolean
+  preventDefaultClose?: boolean;
+  hideCloseBtn?: boolean
 }

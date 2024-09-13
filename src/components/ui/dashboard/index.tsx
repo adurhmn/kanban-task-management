@@ -1,5 +1,5 @@
 import { Button } from "../../core";
-import { Plus } from "lucide-react";
+import { Loader, Plus } from "lucide-react";
 import { useCallback, useState } from "react";
 import { useBoardStore, useColumnStore } from "@/store";
 import { Draggable, Droppable } from "@hello-pangea/dnd";
@@ -41,9 +41,15 @@ export default function Dashboard() {
   const { setShowEditBoardModal, EditBoardModal } = useEditBoardModal();
 
   const ContentCallback = useCallback(() => {
-    const columns = allColumns?.[activeBoard] || [];
+    const columns = allColumns?.[activeBoard];
 
     if (!activeBoard) return <NoBoardsContent />;
+    if (!columns)
+      return (
+        <div className="w-full h-full flex items-center justify-center">
+          <Loader className="animate-spin" />
+        </div>
+      );
     if (columns.length === 0)
       return <NoColsContent handleAddCol={() => setShowEditBoardModal(true)} />;
     return (

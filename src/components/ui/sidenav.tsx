@@ -120,7 +120,7 @@ const CreateBtn = memo(() => {
                       })
                     }
                   >
-                    <IconCross />
+                    <IconCross className="hover:fill-red-500"/>
                   </button>
                 </div>
               ))}

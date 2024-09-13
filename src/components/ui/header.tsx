@@ -165,7 +165,7 @@ const AddTaskButton = memo(() => {
                       })
                     }
                   >
-                    <IconCross />
+                    <IconCross className="hover:fill-red-500"/>
                   </button>
                 </div>
               ))}
@@ -205,7 +205,7 @@ const AddTaskButton = memo(() => {
                       error?.message ? "border-red-500" : ""
                     )}
                   >
-                    <SelectValue placeholder="Column" ref={ref} />
+                    <SelectValue ref={ref} />
                   </SelectTrigger>
                   <p className="p1 text-red-500 ml-2">{error?.message}</p>
                   <SelectContent className="bg-white">

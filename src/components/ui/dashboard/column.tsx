@@ -1,6 +1,11 @@
-import {Column as IColumn} from "@/libs/types"
+import { Column as IColumn } from "@/libs/types";
 import { useTasksSync } from "@/libs/hooks/kanban/tasks";
-import { Draggable, DraggableProvided, DraggableStateSnapshot, Droppable } from "@hello-pangea/dnd";
+import {
+  Draggable,
+  DraggableProvided,
+  DraggableStateSnapshot,
+  Droppable,
+} from "@hello-pangea/dnd";
 import { useTaskStore } from "@/store";
 import { useMemo } from "react";
 import cn from "@/libs/utils/cn";
@@ -33,11 +38,11 @@ const Column = ({
       {...provided.draggableProps}
     >
       <div className="flex gap-3 items-center opacity-60 mb-8">
-        <span
+        {/* <span
           className={cn("size-[10px] rounded-full")}
           style={{ background: column.color || "transparent" }}
-        />
-        <h4 className="h4 text-cust-slate-300">{column.name}</h4>
+        /> */}
+        <h4 className="h4 text-cust-slate-500 ml-2">{`${column.name} (${tasks.length})`}</h4>
         <div {...provided.dragHandleProps} className="ml-auto">
           <Grip className="size-8 text-cust-slate-300/60 hover:text-cust-slate-300 ml-auto" />
         </div>
@@ -49,7 +54,7 @@ const Column = ({
       >
         {(provided, snapshot) => (
           <div
-            className={cn("h-full", snapshot.isDraggingOver && "bg-slate-200")}
+            className={cn("h-full rounded-md", snapshot.isDraggingOver && "bg-blue-100")}
             ref={provided.innerRef}
             {...provided.droppableProps}
           >
@@ -74,4 +79,4 @@ const Column = ({
   );
 };
 
-export default Column
+export default Column;

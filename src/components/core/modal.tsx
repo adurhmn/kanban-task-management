@@ -7,6 +7,7 @@ export const Modal = ({
   setShowModal,
   onClose,
   preventDefaultClose,
+  hideCloseBtn,
 }: IModalProps) => {
   const closeModal = () => {
     if (!preventDefaultClose) {
@@ -22,7 +23,7 @@ export const Modal = ({
         if (!open) closeModal();
       }}
     >
-      <DialogContent>{children}</DialogContent>
+      <DialogContent hideCloseBtn={hideCloseBtn}>{children}</DialogContent>
     </Dialog>
   );
 };
