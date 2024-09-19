@@ -19,7 +19,7 @@ export default function Subtask({ task, checked, onCheckedChange }: SubtaskProps
     >
       <Checkbox checked={checked} onCheckedChange={onCheckedChange} />
       <p
-        className={cn("p2 select-none", {
+        className={cn("p2 select-none text-cust-slate-1000", {
           "line-through opacity-50": checked,
         })}
       >

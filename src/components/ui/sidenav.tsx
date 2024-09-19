@@ -13,12 +13,35 @@ import { DROPPABLE_TYPE } from "@/libs/constants/dnd";
 import { useBoardStore } from "@/store";
 import { setActiveBoardAction } from "@/actions/kanban/boards";
 import { useAddBoardModal } from "./modals/add-board-modal";
+import { useState } from "react";
+import { isDarkMode, toggleDarkMode } from "@/actions/app";
 
 function ThemeToggle() {
+  const [_isDarkMode, setIsDarkMode] = useState(isDarkMode());
+
+  const toggle = () => {
+    setIsDarkMode((prev) => !prev);
+    toggleDarkMode();
+  };
+
   return (
-    <div className="w-[100px] rounded-sm px-5 py-3 bg-cust-slate-100 flex gap-3 items-center justify-center">
-      <IconLightTheme />
-      <IconDarkTheme />
+    <div className="w-max rounded-md px-5 py-3 bg-cust-slate-100 flex gap-3 items-center justify-center">
+      <IconLightTheme className="fill-cust-slate-300"/>
+      <div className={cn("h-[30px] w-[60px] rounded-full relative transition-colors", _isDarkMode ? "bg-cust-prim" : "bg-cust-slate-300")} onClick={toggle}>
+        {/* <div
+          className={cn(
+            "transition-all bg-cust-prim h-full rounded-full",
+            _isDarkMode ? "w-full" : "w-0"
+          )}
+        /> */}
+        <span
+          className={cn(
+            "transition-all absolute h-[80%] aspect-square bg-white rounded-full top-[10%]",
+            _isDarkMode ? "left-[30px]" : "left-[3px]"
+          )}
+        />
+      </div>
+      <IconDarkTheme className="fill-cust-slate-300" />
     </div>
   );
 }
@@ -72,7 +95,7 @@ export default function SideNav() {
   const { AddBoardModal, setShowAddBoardModal } = useAddBoardModal();
 
   return (
-    <div className="min-w-[300px] border-cust-slate-200 border-r">
+    <div className="min-w-[300px] border-cust-slate-200 bg-cust-slate-0 border-r">
       <h4 className="h4 text-md my-6 text-cust-slate-300 px-6">
         {`ALL BOARDS (${boards ? boards.length : "?"})`}
       </h4>

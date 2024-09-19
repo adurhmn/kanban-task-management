@@ -14,7 +14,7 @@ const Task = ({
 
   return (
     <div
-      className="w-full rounded-lg shadow-md p-4 bg-white mb-5"
+      className="w-full rounded-lg shadow-md p-4 bg-cust-slate-0 mb-5"
       ref={provided.innerRef}
       onClick={() => {
         setActiveTask({ taskId: task.id, colId: task.columnId });

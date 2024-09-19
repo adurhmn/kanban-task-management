@@ -82,7 +82,7 @@ export default function Dashboard() {
         </Droppable>
         <div className="py-8">
           <button
-            className="min-w-[300px] h-full bg-[#E9EFFA] flex items-center justify-center rounded-lg"
+            className="min-w-[300px] h-full bg-cust-prim-light/10 flex items-center justify-center rounded-lg"
             onClick={() => setShowEditBoardModal(true)}
           >
             <p className="h1 text-cust-slate-300 text-center">+ New Column</p>

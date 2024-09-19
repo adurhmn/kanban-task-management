@@ -2,8 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: "Plus Jakarta Sans", sans-serif;
+@layer base {
+  body {
+    font-family: "Plus Jakarta Sans", sans-serif;
+  }
+
+  :root {
+    --color-slate-0: 255 255 255;
+    --color-slate-100: 244 247 253;
+    --color-slate-200: 228 235 250;
+    --color-slate-300: 130 143 163;
+    --color-slate-1000: 0 0 0;
+  }
+
+  :root[class~="dark"] {
+    --color-slate-0: 43 44 55;
+    --color-slate-100: 32 33 44;
+    --color-slate-200: 62 63 78;
+    --color-slate-300: 130 143 163; /*no change*/
+    --color-slate-1000: 255 255 255;
+  }
 }
 
 @layer utilities {
@@ -38,4 +56,18 @@ body {
     font-size: 12px;
     line-height: 15px;
   }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  @apply text-cust-slate-1000;
+}
+
+button > p {
+  color: currentColor;
 }

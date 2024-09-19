@@ -32,7 +32,7 @@ const Column = ({
     <div
       className={cn(
         "min-w-[300px] p-[10px] flex flex-col ml-8 rounded-lg bg-cust-prim-light/10",
-        snapshot.isDragging && "bg-blue-100"
+        // snapshot.isDragging && "bg-cust-slate-0"
       )}
       ref={provided.innerRef}
       {...provided.draggableProps}
@@ -42,7 +42,7 @@ const Column = ({
           className={cn("size-[10px] rounded-full")}
           style={{ background: column.color || "transparent" }}
         /> */}
-        <h4 className="h4 text-cust-slate-500 ml-2">{`${column.name} (${tasks.length})`}</h4>
+        <h4 className="h4 text-cust-slate-300 ml-2">{`${column.name} (${tasks.length})`}</h4>
         <div {...provided.dragHandleProps} className="ml-auto">
           <Grip className="size-8 text-cust-slate-300/60 hover:text-cust-slate-300 ml-auto" />
         </div>
@@ -54,7 +54,7 @@ const Column = ({
       >
         {(provided, snapshot) => (
           <div
-            className={cn("h-full rounded-md", snapshot.isDraggingOver && "bg-blue-100")}
+            className={cn("h-full rounded-md", snapshot.isDraggingOver && "bg-cust-prim-light/30")}
             ref={provided.innerRef}
             {...provided.droppableProps}
           >

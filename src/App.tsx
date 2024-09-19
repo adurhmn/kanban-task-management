@@ -3,8 +3,10 @@ import SideNav from "@/components/ui/sidenav";
 import { useConnectIDB } from "@/libs/hooks/idb";
 import Dashboard from "./components/ui/dashboard";
 import { useBoardSync, useColumnSync } from "./libs/hooks/kanban";
+import { useColorModeSync } from "./libs/hooks/app";
 
 function App() {
+  useColorModeSync();
   useConnectIDB();
   useBoardSync();
   useColumnSync();

@@ -40,18 +40,18 @@ const TaskActions = ({
     <>
       <Popover>
         <PopoverTrigger asChild>
-          <EllipsisVertical className="cursor-pointer" />
+          <EllipsisVertical className="cursor-pointer text-cust-slate-1000" />
         </PopoverTrigger>
         <PopoverContent className="w-32 p-0 border-none">
-          <div className="grid bg-white rounded-md">
+          <div className="grid bg-cust-slate-100 rounded-md">
             <button
-              className="text-center p-4 py-2 w-full hover:bg-slate-100 transition-colors rounded-md p1"
+              className="text-center p-4 py-2 w-full hover:bg-cust-slate-200 transition-colors rounded-md p1"
               onClick={activateEditMode}
             >
-              Edit Task
+              <p className="text-cust-slate-1000">Edit Task</p>
             </button>
             <button
-              className="text-center p-4 py-2 w-full hover:bg-red-100 transition-colors rounded-md p1 text-cust-destructive"
+              className="text-center p-4 py-2 w-full hover:bg-cust-slate-200 transition-colors rounded-md p1 text-cust-destructive"
               onClick={onDelete}
             >
               Delete Task
@@ -83,7 +83,7 @@ const ViewTaskContent = ({
   return task ? (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-2 mt-2">
-        <h2 className="h2 w-[80%]">{task.title}</h2>
+        <h2 className="h2 w-[80%] text-cust-slate-1000">{task.title}</h2>
         <TaskActions activateEditMode={activateEditMode} onDelete={onDelete} />
       </div>
       <p className="p1 text-cust-slate-300">{task.desc}</p>
@@ -231,7 +231,7 @@ const EditTaskContent = ({
                     })
                   }
                 >
-                  <IconCross className="group-hover:fill-red-500"/>
+                  <IconCross className="group-hover:fill-red-500" />
                 </button>
               </div>
             ))}
@@ -392,7 +392,12 @@ const TaskModal = () => {
   }, [activeTask, setShowModal]);
 
   return (
-    <Modal showModal={showModal} setShowModal={setShowModal} onClose={onClose} hideCloseBtn>
+    <Modal
+      showModal={showModal}
+      setShowModal={setShowModal}
+      onClose={onClose}
+      hideCloseBtn
+    >
       {mode === ModalModes.VIEW && task && (
         <ViewTaskContent
           task={task}

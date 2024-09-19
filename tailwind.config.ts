@@ -18,14 +18,15 @@ const config: Config = {
             light: "#FF9898",
           },
           slate: {
-            0: "#FFFFFF", // white
-            100: "#F4F7FD",
-            200: "#E4EBFA",
-            300: "#828FA3",
-            400: "#3E3F4E",
-            500: "#2B2C37",
-            600: "#20212C",
-            700: "#000112",
+            0: "rgb(var(--color-slate-0) / <alpha-value>)", // white
+            100: "rgb(var(--color-slate-100) / <alpha-value>)",
+            200: "rgb(var(--color-slate-200) / <alpha-value>)",
+            300: "rgb(var(--color-slate-300) / <alpha-value>)",
+            // 400: "#3E3F4E",
+            // 500: "#2B2C37",
+            // 600: "#20212C",
+            // 700: "#000112",
+            1000: "rgb(var(--color-slate-1000) / <alpha-value>)",
           },
         },
       },
@@ -34,3 +35,6 @@ const config: Config = {
   plugins: [animatePlugin],
 };
 export default config;
+
+// Text Black -> Text White
+//
