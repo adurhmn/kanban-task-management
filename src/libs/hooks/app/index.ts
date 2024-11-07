@@ -8,3 +8,5 @@ export const useColorModeSync = () => {
     }
   }, []);
 };
+
+export * from "./use-media-query"

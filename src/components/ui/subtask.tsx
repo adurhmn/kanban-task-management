@@ -7,11 +7,15 @@ interface SubtaskProps {
   onCheckedChange: (checked: boolean) => void;
 }
 
-export default function Subtask({ task, checked, onCheckedChange }: SubtaskProps) {
+export default function Subtask({
+  task,
+  checked,
+  onCheckedChange,
+}: SubtaskProps) {
   return (
     <div
       className={cn(
-        "p-3 rounded-[4px] flex  items-center justify-start gap-4 h-10 min-w-[350px] max-w-[450px] bg-cust-slate-100 hover:bg-cust-prim/20 cursor-pointer"
+        "p-3 rounded-[4px] flex  items-center justify-start gap-4 h-10 w-full max-w-[450px] bg-cust-slate-100 hover:bg-cust-prim/20 cursor-pointer"
       )}
       onClick={() => {
         onCheckedChange(!checked);

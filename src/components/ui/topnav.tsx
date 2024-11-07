@@ -1,5 +1,5 @@
 import IconBoard from "@/assets/icons/board";
-import { ChevronLeft, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import cn from "@/libs/utils/cn";
 import IconLightTheme from "@/assets/icons/light-theme";
 import IconDarkTheme from "@/assets/icons/dark-theme";
@@ -99,20 +99,16 @@ const NavItem = ({
   );
 };
 
-export default function SideNav() {
+export default function TopNav() {
   const { boards, activeBoard } = useBoardStore();
-  const [isOpen, setIsOpen] = useState(true);
   const { AddBoardModal, setShowAddBoardModal } = useAddBoardModal();
 
   return (
-    <div
-      className="min-w-[300px] border-cust-slate-200 bg-cust-slate-0 border-r relative flex flex-col transition-[margin-left]"
-      style={{ marginLeft: isOpen ? 0 : -300 }}
-    >
+    <div className="w-[300px] bg-cust-slate-0 rounded-lg shadow-md h-max z-10">
       <h4 className="h4 text-md my-6 text-cust-slate-300 px-6">
         {`ALL BOARDS (${boards ? boards.length : "?"})`}
       </h4>
-      <div className="h-[700px] max-h-[700px] flex flex-col">
+      <div className="max-h-[400px] flex flex-col">
         {boards === null ? (
           "Boards Loading"
         ) : (
@@ -174,19 +170,10 @@ export default function SideNav() {
           </>
         )}
       </div>
-      <div className="mt-auto mb-6 flex items-center justify-center">
+      <div className="my-3 flex items-center justify-center">
         <ThemeToggle />
       </div>
       <AddBoardModal />
-      <button
-        className="rounded-r-full p-2 bg-cust-slate-0 absolute right-0 top-1/2 -translate-y-1/2 translate-x-full border border-l-0 border-cust-slate-200"
-        onClick={() => setIsOpen((prev) => !prev)}
-      >
-        <ChevronLeft
-          className="transition-[rotate] ease-out duration-700 text-cust-prim"
-          style={{ rotate: isOpen ? "0deg" : "180deg" }}
-        />
-      </button>
     </div>
   );
 }

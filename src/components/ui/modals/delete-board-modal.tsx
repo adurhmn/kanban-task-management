@@ -64,9 +64,8 @@ const useDeleteBoardModal = () => {
         showModal={!!activeBoard && !!board && showDeleteBoardModal}
         setShowModal={setShowDeleteBoardModal}
         handleDelete={() => {
-          deleteBoardAction(activeBoard).then(() => {
-            setShowDeleteBoardModal(false);
-          });
+          setShowDeleteBoardModal(false);
+          deleteBoardAction(activeBoard);
         }}
       />
     );

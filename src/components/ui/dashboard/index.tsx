@@ -10,7 +10,7 @@ import { useEditBoardModal } from "../modals/edit-board-modal";
 
 const NoBoardsContent = () => {
   return (
-    <div className="flex items-center justify-center w-full h-full">
+    <div className="flex items-center justify-center w-full h-full bg-cust-slate-100">
       <div className="flex flex-col gap-6 items-center w-max">
         <h2 className="h2 text-cust-slate-300">Add boards to get started</h2>
       </div>
@@ -20,7 +20,7 @@ const NoBoardsContent = () => {
 
 const NoColsContent = ({ handleAddCol }: { handleAddCol: () => void }) => {
   return (
-    <div className="flex items-center justify-center w-full h-full">
+    <div className="flex items-center justify-center w-full h-full bg-cust-slate-100">
       <div className="flex flex-col gap-6 items-center w-max">
         <h2 className="h2 text-cust-slate-300">
           The board is empty. Create a new column to get started
@@ -61,7 +61,7 @@ export default function Dashboard() {
         >
           {(provided) => (
             <div
-              className="flex min-w-max h-full p-8"
+              className="flex min-w-max h-full p-8 pl-0 sm:pl-8"
               ref={provided.innerRef}
               {...provided.droppableProps}
             >
@@ -80,7 +80,7 @@ export default function Dashboard() {
             </div>
           )}
         </Droppable>
-        <div className="py-8">
+        <div className="py-8 pr-8">
           <button
             className="min-w-[300px] h-full bg-cust-prim-light/10 flex items-center justify-center rounded-lg"
             onClick={() => setShowEditBoardModal(true)}
