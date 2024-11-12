@@ -171,25 +171,4 @@ const AddTaskModal = memo(
   }
 );
 
-const useAddTaskModal = () => {
-  const [showAddTaskModal, setShowAddTaskModal] = useState(false);
-
-  const AddTaskModalCallback = useCallback(() => {
-    return (
-      <AddTaskModal
-        showModal={showAddTaskModal}
-        setShowModal={setShowAddTaskModal}
-      />
-    );
-  }, [showAddTaskModal]);
-
-  return useMemo(
-    () => ({
-      setShowAddTaskModal,
-      AddTaskModal: AddTaskModalCallback,
-    }),
-    [AddTaskModalCallback]
-  );
-};
-
-export { AddTaskModal, useAddTaskModal };
+export default AddTaskModal;

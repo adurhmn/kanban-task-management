@@ -427,4 +427,4 @@ const TaskModal = () => {
   );
 };
 
-export { TaskModal };
+export default TaskModal;

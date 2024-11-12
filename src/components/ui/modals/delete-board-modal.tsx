@@ -1,8 +1,6 @@
-import { deleteBoardAction } from "@/actions/kanban/boards";
 import { Button, Modal } from "@/components/core";
 import { Board } from "@/libs/types";
-import { useBoardStore } from "@/store";
-import React, { useState, useCallback, useMemo } from "react";
+import React from "react";
 
 interface DeleteBoardModalProps {
   board?: Board;
@@ -52,32 +50,4 @@ const DeleteBoardModal: React.FC<DeleteBoardModalProps> = ({
   );
 };
 
-const useDeleteBoardModal = () => {
-  const { activeBoard, boards } = useBoardStore();
-  const [showDeleteBoardModal, setShowDeleteBoardModal] = useState(false);
-
-  const DeleteBoardModalCallback = useCallback(() => {
-    const board = boards?.find((b) => b.id === activeBoard);
-    return (
-      <DeleteBoardModal
-        board={board}
-        showModal={!!activeBoard && !!board && showDeleteBoardModal}
-        setShowModal={setShowDeleteBoardModal}
-        handleDelete={() => {
-          setShowDeleteBoardModal(false);
-          deleteBoardAction(activeBoard);
-        }}
-      />
-    );
-  }, [activeBoard, showDeleteBoardModal, boards]);
-
-  return useMemo(
-    () => ({
-      setShowDeleteBoardModal,
-      DeleteBoardModal: DeleteBoardModalCallback,
-    }),
-    [DeleteBoardModalCallback]
-  );
-};
-
-export { DeleteBoardModal, useDeleteBoardModal };
+export default DeleteBoardModal;

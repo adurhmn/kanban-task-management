@@ -12,7 +12,7 @@ import {
 import { DROPPABLE_TYPE } from "@/libs/constants/dnd";
 import { useBoardStore } from "@/store";
 import { setActiveBoardAction } from "@/actions/kanban/boards";
-import { useAddBoardModal } from "./modals/add-board-modal";
+import AddBoardModal from "./modals/add-board-modal";
 import { useState } from "react";
 import { isDarkMode, toggleDarkMode } from "@/actions/app";
 
@@ -102,7 +102,7 @@ const NavItem = ({
 export default function SideNav() {
   const { boards, activeBoard } = useBoardStore();
   const [isOpen, setIsOpen] = useState(true);
-  const { AddBoardModal, setShowAddBoardModal } = useAddBoardModal();
+  const [showAddBoardModal, setShowAddBoardModal] = useState(false);
 
   return (
     <div
@@ -177,7 +177,10 @@ export default function SideNav() {
       <div className="mt-auto mb-6 flex items-center justify-center">
         <ThemeToggle />
       </div>
-      <AddBoardModal />
+      <AddBoardModal
+        showModal={showAddBoardModal}
+        setShowModal={setShowAddBoardModal}
+      />
       <button
         className="rounded-r-full p-2 bg-cust-slate-0 absolute right-0 top-1/2 -translate-y-1/2 translate-x-full border border-l-0 border-cust-slate-200"
         onClick={() => setIsOpen((prev) => !prev)}

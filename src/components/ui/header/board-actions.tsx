@@ -1,21 +1,30 @@
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/core";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/core";
 import { EllipsisVertical } from "lucide-react";
-import { useEditBoardModal } from "../modals/edit-board-modal";
-import { useDeleteBoardModal } from "../modals/delete-board-modal";
+import DeleteBoardModal from "../modals/delete-board-modal";
+import { useBoardStore } from "@/store";
+import cn from "@/libs/utils/cn";
+import { useState } from "react";
+import EditBoardModal from "../modals/edit-board-modal";
+import { deleteBoardAction } from "@/actions/kanban/boards";
 
-export default function BoardActions () {
-  const { setShowEditBoardModal, EditBoardModal } = useEditBoardModal();
-  const { setShowDeleteBoardModal, DeleteBoardModal } = useDeleteBoardModal();
+export default function BoardActions() {
+  const { activeBoard, boards } = useBoardStore();
+  const board = boards?.find((b) => b.id === activeBoard);
+  const [showEditBoardModal, setShowEditBoardModal] = useState(false);
+  const [showDeleteBoardModal, setShowDeleteBoardModal] = useState(false);
 
   return (
     <>
       <Popover>
-        <PopoverTrigger asChild>
-          <EllipsisVertical className="cursor-pointer ml-2 text-cust-slate-1000" />
+        <PopoverTrigger asChild={!!activeBoard} disabled={!activeBoard}>
+          <EllipsisVertical
+            className={cn(
+              "cursor-pointer ml-2",
+              activeBoard
+                ? "text-cust-slate-1000"
+                : "text-cust-slate-300 cursor-not-allowed"
+            )}
+          />
         </PopoverTrigger>
         <PopoverContent className="w-32 p-0 border-none">
           <div className="grid bg-cust-slate-100 rounded-md">
@@ -34,8 +43,20 @@ export default function BoardActions () {
           </div>
         </PopoverContent>
       </Popover>
-      <EditBoardModal />
-      <DeleteBoardModal />
+      <EditBoardModal
+        showModal={showEditBoardModal}
+        setShowModal={setShowEditBoardModal}
+        boardId={activeBoard}
+      />
+      <DeleteBoardModal
+        board={board}
+        showModal={!!activeBoard && !!board && showDeleteBoardModal}
+        setShowModal={setShowDeleteBoardModal}
+        handleDelete={() => {
+          setShowDeleteBoardModal(false);
+          deleteBoardAction(activeBoard);
+        }}
+      />
     </>
   );
-};
+}

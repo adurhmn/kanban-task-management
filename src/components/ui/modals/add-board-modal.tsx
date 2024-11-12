@@ -10,7 +10,7 @@ import {
 import { IModalProps } from "@/libs/types";
 import getRandId from "@/libs/utils/getRandId";
 import { Plus } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 
 const AddBoardModal = ({
@@ -103,25 +103,4 @@ const AddBoardModal = ({
   );
 };
 
-const useAddBoardModal = () => {
-  const [showAddBoardModal, setShowAddBoardModal] = useState(false);
-
-  const AddBoardModalCallback = useCallback(() => {
-    return (
-      <AddBoardModal
-        showModal={showAddBoardModal}
-        setShowModal={setShowAddBoardModal}
-      />
-    );
-  }, [showAddBoardModal]);
-
-  return useMemo(
-    () => ({
-      setShowAddBoardModal,
-      AddBoardModal: AddBoardModalCallback,
-    }),
-    [AddBoardModalCallback]
-  );
-};
-
-export { AddBoardModal, useAddBoardModal };
+export default AddBoardModal;

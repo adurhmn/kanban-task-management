@@ -126,27 +126,4 @@ const EditBoardModal = ({
   );
 };
 
-const useEditBoardModal = () => {
-  const { activeBoard } = useBoardStore();
-  const [showEditBoardModal, setShowEditBoardModal] = useState(false);
-
-  const EditBoardModalCallback = useCallback(() => {
-    return (
-      <EditBoardModal
-        boardId={activeBoard}
-        showModal={!!activeBoard && showEditBoardModal}
-        setShowModal={setShowEditBoardModal}
-      />
-    );
-  }, [activeBoard, showEditBoardModal]);
-
-  return useMemo(
-    () => ({
-      setShowEditBoardModal,
-      EditBoardModal: EditBoardModalCallback,
-    }),
-    [EditBoardModalCallback]
-  );
-};
-
-export { EditBoardModal, useEditBoardModal };
+export default EditBoardModal;

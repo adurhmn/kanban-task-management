@@ -5,8 +5,8 @@ import { useBoardStore, useColumnStore } from "@/store";
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 import { DROPPABLE_TYPE } from "@/libs/constants/dnd";
 import Column from "./column";
-import { TaskModal } from "../modals";
-import { useEditBoardModal } from "../modals/edit-board-modal";
+import EditBoardModal from "../modals/edit-board-modal";
+import TaskModal from "../modals/task-modal";
 
 const NoBoardsContent = () => {
   return (
@@ -37,8 +37,7 @@ const NoColsContent = ({ handleAddCol }: { handleAddCol: () => void }) => {
 export default function Dashboard() {
   const { activeBoard } = useBoardStore();
   const { columns: allColumns } = useColumnStore();
-
-  const { setShowEditBoardModal, EditBoardModal } = useEditBoardModal();
+  const [showEditBoardModal, setShowEditBoardModal] = useState(false);
 
   const ContentCallback = useCallback(() => {
     const columns = allColumns?.[activeBoard];
@@ -95,7 +94,11 @@ export default function Dashboard() {
   return (
     <>
       <ContentCallback />
-      <EditBoardModal />
+      <EditBoardModal
+        showModal={showEditBoardModal}
+        setShowModal={setShowEditBoardModal}
+        boardId={activeBoard}
+      />
       <TaskModal />
     </>
   );

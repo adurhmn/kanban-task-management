@@ -3,14 +3,14 @@
 
 import { useBoardStore, useColumnStore } from "@/store";
 import { Plus } from "lucide-react";
-import { useMemo } from "react";
-import { useAddTaskModal } from "../modals/add-task-modal";
+import { useMemo, useState } from "react";
 import IconLogo from "@/assets/icons/logo";
 import { Button } from "@/components/core";
 import BoardActions from "./board-actions";
+import AddTaskModal from "../modals/add-task-modal";
 
 export default function HeaderDesktop() {
-  const { setShowAddTaskModal, AddTaskModal } = useAddTaskModal();
+  const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const { activeBoard, boards } = useBoardStore();
   const { columns } = useColumnStore();
   const board = useMemo(
@@ -34,7 +34,10 @@ export default function HeaderDesktop() {
         </Button>
         <BoardActions />
       </div>
-      <AddTaskModal />
+      <AddTaskModal
+        showModal={showAddTaskModal}
+        setShowModal={setShowAddTaskModal}
+      />
     </div>
   );
 }
