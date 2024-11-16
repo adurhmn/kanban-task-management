@@ -4,19 +4,23 @@ import { create } from "zustand";
 
 // TODO: sort data on view, instead of on store
 interface BoardStore {
+  boardsLoaded: boolean;
   boards: Board[] | null;
   activeBoard: string;
   addBoard: (board: Board) => void;
   deleteBoard: (id: string) => Board | null;
   setBoards: (boards: Board[]) => void;
   setActiveBoard: (id: string) => void;
+  setBoardsLoaded: (isLoaded: boolean) => void;
 }
 
 interface ColumnStore {
+  columnsLoaded: boolean;
   columns: { [boardId: string]: Column[] } | null;
   addColumns: (column: Column[], boardId: string) => void;
   setColumns: (column: Column[], boardId: string) => void;
   deleteColumn: (colId: string, boardId: string) => Column | null;
+  setColumnsLoaded: (isLoaded: boolean) => void;
 }
 
 interface TaskStore {
@@ -37,6 +41,7 @@ interface SubtaskStore {
 }
 
 const useBoardStore = create<BoardStore>((set, getStore) => ({
+  boardsLoaded: false,
   boards: null,
   activeBoard: "",
   addBoard: (board) =>
@@ -71,9 +76,11 @@ const useBoardStore = create<BoardStore>((set, getStore) => ({
         "",
     })),
   setActiveBoard: (id) => set({ activeBoard: id }),
+  setBoardsLoaded: (isLoaded) => set({ boardsLoaded: isLoaded }),
 }));
 
 const useColumnStore = create<ColumnStore>((set, getStore) => ({
+  columnsLoaded: false,
   columns: null,
   addColumns: (columns, boardId) => {
     set((state) => ({
@@ -110,6 +117,7 @@ const useColumnStore = create<ColumnStore>((set, getStore) => ({
 
     return colToRemove ? colToRemove : null;
   },
+  setColumnsLoaded: (isLoaded) => set({ columnsLoaded: isLoaded }),
 }));
 
 const useTaskStore = create<TaskStore>((set, getStore) => ({

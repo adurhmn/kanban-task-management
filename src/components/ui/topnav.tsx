@@ -12,7 +12,7 @@ import {
 import { DROPPABLE_TYPE } from "@/libs/constants/dnd";
 import { useBoardStore } from "@/store";
 import { setActiveBoardAction } from "@/actions/kanban/boards";
-import { useAddBoardModal } from "./modals/add-board-modal";
+import AddBoardModal from "./modals/add-board-modal";
 import { useState } from "react";
 import { isDarkMode, toggleDarkMode } from "@/actions/app";
 
@@ -101,7 +101,7 @@ const NavItem = ({
 
 export default function TopNav() {
   const { boards, activeBoard } = useBoardStore();
-  const { AddBoardModal, setShowAddBoardModal } = useAddBoardModal();
+  const [showAddBoardModal, setShowAddBoardModal] = useState(false);
 
   return (
     <div className="w-[300px] bg-cust-slate-0 rounded-lg shadow-md h-max z-10">
@@ -173,7 +173,10 @@ export default function TopNav() {
       <div className="my-3 flex items-center justify-center">
         <ThemeToggle />
       </div>
-      <AddBoardModal />
+      <AddBoardModal
+        showModal={showAddBoardModal}
+        setShowModal={setShowAddBoardModal}
+      />
     </div>
   );
 }

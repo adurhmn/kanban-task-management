@@ -4,7 +4,7 @@
 import { useBoardStore, useColumnStore } from "@/store";
 import { ChevronDown, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useAddTaskModal } from "../modals/add-task-modal";
+import AddTaskModal from "../modals/add-task-modal";
 import { Button } from "@/components/core";
 import BoardActions from "./board-actions";
 import TopNav from "../topnav";
@@ -12,7 +12,7 @@ import IconLogoMobile from "@/assets/icons/logo-mobile";
 import cn from "@/libs/utils/cn";
 
 export default function HeaderDesktop() {
-  const { setShowAddTaskModal, AddTaskModal } = useAddTaskModal();
+  const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const { activeBoard, boards } = useBoardStore();
   const { columns } = useColumnStore();
   const board = useMemo(
@@ -51,7 +51,10 @@ export default function HeaderDesktop() {
         </Button>
         <BoardActions />
       </div>
-      <AddTaskModal />
+      <AddTaskModal
+        showModal={showAddTaskModal}
+        setShowModal={setShowAddTaskModal}
+      />
       {isNavOpen && (
         <div className="absolute min-w-[100vw] min-h-screen left-0 bottom-0 translate-y-full flex justify-center z-10 p-6">
           <div

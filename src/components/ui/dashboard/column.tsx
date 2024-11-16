@@ -31,7 +31,7 @@ const Column = ({
   return (
     <div
       className={cn(
-        "min-w-[300px] p-[10px] flex flex-col ml-8 rounded-lg bg-cust-prim-light/10",
+        "min-w-[300px] p-[10px] flex flex-col ml-8 rounded-lg bg-cust-prim-light/10"
         // snapshot.isDragging && "bg-cust-slate-0"
       )}
       ref={provided.innerRef}
@@ -54,7 +54,10 @@ const Column = ({
       >
         {(provided, snapshot) => (
           <div
-            className={cn("h-full rounded-md", snapshot.isDraggingOver && "bg-cust-prim-light/30")}
+            className={cn(
+              "h-full rounded-md",
+              snapshot.isDraggingOver && "bg-cust-prim-light/30"
+            )}
             ref={provided.innerRef}
             {...provided.droppableProps}
           >

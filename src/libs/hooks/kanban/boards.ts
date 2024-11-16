@@ -3,7 +3,7 @@ import { useBoardStore, useIDBStore } from "@/store";
 import { useEffect } from "react";
 
 const useBoardSync = () => {
-  const { setBoards } = useBoardStore();
+  const { setBoards, setBoardsLoaded } = useBoardStore();
   const { db } = useIDBStore();
 
   useEffect(() => {
@@ -17,6 +17,9 @@ const useBoardSync = () => {
         .catch((err) => {
           console.log(err);
           alert("Boards Fetch Failed");
+        })
+        .finally(() => {
+          setBoardsLoaded(true);
         });
     }
   }, [db]);

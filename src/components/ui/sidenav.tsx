@@ -1,5 +1,5 @@
 import IconBoard from "@/assets/icons/board";
-import { ChevronLeft, Plus } from "lucide-react";
+import { ChevronLeft, Loader, Plus } from "lucide-react";
 import cn from "@/libs/utils/cn";
 import IconLightTheme from "@/assets/icons/light-theme";
 import IconDarkTheme from "@/assets/icons/dark-theme";
@@ -15,6 +15,7 @@ import { setActiveBoardAction } from "@/actions/kanban/boards";
 import AddBoardModal from "./modals/add-board-modal";
 import { useState } from "react";
 import { isDarkMode, toggleDarkMode } from "@/actions/app";
+import { LOCAL_KEYS } from "@/libs/constants";
 
 function ThemeToggle() {
   const [_isDarkMode, setIsDarkMode] = useState(isDarkMode());
@@ -101,7 +102,9 @@ const NavItem = ({
 
 export default function SideNav() {
   const { boards, activeBoard } = useBoardStore();
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(
+    localStorage.getItem(LOCAL_KEYS.IS_SIDENAV_OPEN) == "1"
+  );
   const [showAddBoardModal, setShowAddBoardModal] = useState(false);
 
   return (
@@ -114,7 +117,9 @@ export default function SideNav() {
       </h4>
       <div className="h-[700px] max-h-[700px] flex flex-col">
         {boards === null ? (
-          "Boards Loading"
+          <div className="h-full w-full flex items-center justify-center">
+            <Loader className="text-cust-prim-light animate-spin" />
+          </div>
         ) : (
           <>
             <Droppable
@@ -183,10 +188,18 @@ export default function SideNav() {
       />
       <button
         className="rounded-r-full p-2 bg-cust-slate-0 absolute right-0 top-1/2 -translate-y-1/2 translate-x-full border border-l-0 border-cust-slate-200"
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={() =>
+          setIsOpen((prev) => {
+            localStorage.setItem(
+              LOCAL_KEYS.IS_SIDENAV_OPEN,
+              String(Number(!prev))
+            );
+            return !prev;
+          })
+        }
       >
         <ChevronLeft
-          className="transition-[rotate] ease-out duration-700 text-cust-prim"
+          className="transition-[rotate] ease-out text-cust-prim"
           style={{ rotate: isOpen ? "0deg" : "180deg" }}
         />
       </button>

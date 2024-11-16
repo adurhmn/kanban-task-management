@@ -71,3 +71,23 @@ p {
 button > p {
   color: currentColor;
 }
+
+/* Target the scrollbar */
+::-webkit-scrollbar {
+  width: 5px; /* Width of the vertical scrollbar */
+  height: 5px; /* Height of the horizontal scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-cust-prim-light/30;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-cust-prim;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

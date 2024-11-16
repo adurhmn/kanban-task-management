@@ -35,23 +35,24 @@ const NoColsContent = ({ handleAddCol }: { handleAddCol: () => void }) => {
 };
 
 export default function Dashboard() {
-  const { activeBoard } = useBoardStore();
-  const { columns: allColumns } = useColumnStore();
+  const { activeBoard, boardsLoaded } = useBoardStore();
+  const { columns: allColumns, columnsLoaded } = useColumnStore();
   const [showEditBoardModal, setShowEditBoardModal] = useState(false);
+  const columns = allColumns?.[activeBoard];
 
-  const ContentCallback = useCallback(() => {
-    const columns = allColumns?.[activeBoard];
-
-    if (!activeBoard) return <NoBoardsContent />;
-    if (!columns)
-      return (
-        <div className="w-full h-full flex items-center justify-center">
-          <Loader className="animate-spin" />
-        </div>
-      );
-    if (columns.length === 0)
-      return <NoColsContent handleAddCol={() => setShowEditBoardModal(true)} />;
+  if (!boardsLoaded || !columnsLoaded) {
     return (
+      <div className="w-full h-full flex items-center justify-center bg-cust-slate-100">
+        <Loader className="animate-spin text-cust-prim-light" />
+      </div>
+    );
+  }
+  if (!activeBoard) return <NoBoardsContent />;
+  if (!columns || columns.length === 0)
+    return <NoColsContent handleAddCol={() => setShowEditBoardModal(true)} />;
+
+  return (
+    <>
       <div className="w-full h-full flex-shrink bg-cust-slate-100 overflow-auto flex">
         <Droppable
           droppableId="columns"
@@ -60,7 +61,7 @@ export default function Dashboard() {
         >
           {(provided) => (
             <div
-              className="flex min-w-max h-full p-8 pl-0 sm:pl-8"
+              className="flex min-w-max h-full overflow-auto p-8 pl-0 sm:pl-8"
               ref={provided.innerRef}
               {...provided.droppableProps}
             >
@@ -88,12 +89,6 @@ export default function Dashboard() {
           </button>
         </div>
       </div>
-    );
-  }, [activeBoard, allColumns, setShowEditBoardModal]);
-
-  return (
-    <>
-      <ContentCallback />
       <EditBoardModal
         showModal={showEditBoardModal}
         setShowModal={setShowEditBoardModal}
