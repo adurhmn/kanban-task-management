@@ -22,7 +22,7 @@ export default function HeaderDesktop() {
   const [isNavOpen, setIsNavOpen] = useState(false);
 
   return (
-    <div className="flex items-center h-[80px] bg-cust-slate-0 relative border-b border-cust-slate-200">
+    <div className="flex items-center min-h-[80px] bg-cust-slate-0 relative border-b border-cust-slate-200">
       <IconLogoMobile className="ml-6" />
       <div className="flex items-center flex-grow h-full py-4 px-7">
         <button

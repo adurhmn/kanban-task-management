@@ -1,0 +1,11 @@
+.columnsWrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 332px);
+  grid-template-rows: 1fr;
+  height: calc(100vh - 80px);
+  overflow: auto;
+  width: 100%;
+  flex-shrink: 1;
+  grid-auto-flow: column;
+  @apply bg-cust-slate-100 p-8 pl-0 sm:pl-8;
+}

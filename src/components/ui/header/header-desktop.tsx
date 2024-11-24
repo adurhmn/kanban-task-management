@@ -19,7 +19,7 @@ export default function HeaderDesktop() {
   );
 
   return (
-    <div className="flex items-center h-[80px] bg-cust-slate-0">
+    <div className="flex items-center min-h-[80px] bg-cust-slate-0">
       <div className="w-[300px] h-full flex items-center justify-center border-cust-slate-200 border-b border-r flex-shrink-0">
         <IconLogo pathClassName="fill-cust-slate-1000" />
       </div>

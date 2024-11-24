@@ -1,12 +1,13 @@
 import { Button } from "../../core";
 import { Loader, Plus } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { useBoardStore, useColumnStore } from "@/store";
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 import { DROPPABLE_TYPE } from "@/libs/constants/dnd";
 import Column from "./column";
 import EditBoardModal from "../modals/edit-board-modal";
 import TaskModal from "../modals/task-modal";
+import styles from "./index.module.css";
 
 const NoBoardsContent = () => {
   return (
@@ -53,42 +54,35 @@ export default function Dashboard() {
 
   return (
     <>
-      <div className="w-full h-full flex-shrink bg-cust-slate-100 overflow-auto flex">
-        <Droppable
-          droppableId="columns"
-          type={DROPPABLE_TYPE.COLUMNS}
-          direction="horizontal"
-        >
-          {(provided) => (
-            <div
-              className="flex min-w-max h-full overflow-auto p-8 pl-0 sm:pl-8"
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-            >
-              {columns.map((c) => (
-                <Draggable draggableId={c.id} index={c.index} key={c.id}>
-                  {(provided, snapshot) => (
-                    <Column
-                      column={c}
-                      provided={provided}
-                      snapshot={snapshot}
-                    />
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-        <div className="py-8 pr-8">
-          <button
-            className="min-w-[300px] h-full bg-cust-prim-light/10 flex items-center justify-center rounded-lg"
-            onClick={() => setShowEditBoardModal(true)}
+      <Droppable
+        droppableId="columns"
+        type={DROPPABLE_TYPE.COLUMNS}
+        direction="horizontal"
+      >
+        {(provided) => (
+          <div
+            className={styles.columnsWrapper}
+            ref={provided.innerRef}
+            {...provided.droppableProps}
           >
-            <p className="h1 text-cust-slate-300 text-center">+ New Column</p>
-          </button>
-        </div>
-      </div>
+            {columns.map((c) => (
+              <Draggable draggableId={c.id} index={c.index} key={c.id}>
+                {(provided, snapshot) => (
+                  <Column column={c} provided={provided} snapshot={snapshot} />
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
+            <button
+              className="w-[300px] h-full bg-cust-prim-light/10 flex items-center justify-center rounded-lg ml-8"
+              onClick={() => setShowEditBoardModal(true)}
+            >
+              <p className="h1 text-cust-slate-300 text-center">+ New Column</p>
+            </button>
+          </div>
+        )}
+      </Droppable>
+
       <EditBoardModal
         showModal={showEditBoardModal}
         setShowModal={setShowEditBoardModal}

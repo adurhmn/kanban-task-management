@@ -31,7 +31,7 @@ const Column = ({
   return (
     <div
       className={cn(
-        "min-w-[300px] p-[10px] flex flex-col ml-8 rounded-lg bg-cust-prim-light/10"
+        "w-[300px] p-[10px] flex flex-col ml-8 rounded-lg bg-cust-prim-light/10"
         // snapshot.isDragging && "bg-cust-slate-0"
       )}
       ref={provided.innerRef}
