@@ -126,7 +126,7 @@ export default function SideNav() {
               droppableId="sidenav-boards"
               type={DROPPABLE_TYPE.BOARDS}
             >
-              {(provided, snapshot) => (
+              {(provided) => (
                 <ul
                   ref={provided.innerRef}
                   className={cn(

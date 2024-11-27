@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useBoardStore, useColumnStore } from "@/store";
 import { addTaskAction } from "@/actions/kanban/tasks";
@@ -90,7 +90,7 @@ const AddTaskModal = memo(
           <div>
             <h4 className="p2 text-cust-slate-300 mb-2">{`Sub Tasks (${subtasks.length})`}</h4>
             <div className="flex flex-col gap-3">
-              {subtasks.map((id, idx) => (
+              {subtasks.map((id) => (
                 <div className="flex gap-3 items-center" key={id}>
                   <Input
                     placeholder="e.g: Learn rocket science, call Elon Musk for help"

@@ -11,7 +11,7 @@ import { IModalProps } from "@/libs/types";
 import getRandId from "@/libs/utils/getRandId";
 import { useBoardStore, useColumnStore } from "@/store";
 import { Plus } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 
 const EditBoardModal = ({
@@ -74,7 +74,7 @@ const EditBoardModal = ({
         <div>
           <h4 className="p2 text-cust-slate-300 mb-2">{`Board Columns (${cols.length})`}</h4>
           <div className="flex flex-col gap-3">
-            {cols.map((id, idx) => (
+            {cols.map((id) => (
               <div className="flex gap-3 items-center" key={id}>
                 <Input
                   placeholder="e.g: Pending / Current / Completed"

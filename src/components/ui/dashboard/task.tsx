@@ -4,7 +4,6 @@ import { DraggableProvided, DraggableStateSnapshot } from "@hello-pangea/dnd";
 const Task = ({
   task,
   provided,
-  snapshot,
 }: {
   task: ITask;
   provided: DraggableProvided;

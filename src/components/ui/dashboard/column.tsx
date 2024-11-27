@@ -16,7 +16,6 @@ import Task from "./task";
 const Column = ({
   column,
   provided,
-  snapshot,
 }: {
   column: IColumn;
   provided: DraggableProvided;
