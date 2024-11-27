@@ -80,7 +80,7 @@ const useBoardStore = create<BoardStore>((set, getStore) => ({
 }));
 
 const useColumnStore = create<ColumnStore>((set, getStore) => ({
-  columnsLoaded: false,
+  columnsLoaded: true,
   columns: null,
   addColumns: (columns, boardId) => {
     set((state) => ({
