@@ -8,7 +8,6 @@ const HeaderMobile = React.lazy(() => import("./header-mobile"));
 export default function Header() {
   const { isMobile } = useMediaQuery();
 
-  // TODO: use skeleton for loading screen
   if (isMobile) {
     return (
       <Suspense fallback={<HeaderLoader />}>
