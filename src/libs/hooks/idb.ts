@@ -1,6 +1,7 @@
 import { useIDBStore } from "@/store";
 import { useEffect } from "react";
 import {
+  BOARDS_STORE,
   COLUMNS_STORE,
   IDB_NAME,
   IDB_VERSION,
@@ -10,6 +11,7 @@ import {
 } from "../constants";
 
 function loadV1Schema(db: IDBDatabase) {
+  db.createObjectStore(BOARDS_STORE, { keyPath: "id" });
   const columnsStore = db.createObjectStore(COLUMNS_STORE, { keyPath: "id" });
   const tasksStore = db.createObjectStore(TASKS_STORE, { keyPath: "id" });
   const subtasksStore = db.createObjectStore(SUBTASKS_STORE, { keyPath: "id" });
