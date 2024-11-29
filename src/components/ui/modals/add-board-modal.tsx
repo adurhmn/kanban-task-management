@@ -1,4 +1,4 @@
-import { addBoardAction } from "@/actions/kanban/boards";
+import { addBoardAction, setActiveBoardAction } from "@/actions/kanban/boards";
 import IconCross from "@/assets/icons/cross";
 import {
   Button,
@@ -24,19 +24,13 @@ const M = ({
     unregister,
     formState: { errors },
     handleSubmit,
-    reset: resetForm,
   } = useForm();
 
   const [cols, setCols] = useState([`col-${getRandId()}`]);
 
-  const reset = useCallback(() => {
-    setCols([`col-${getRandId()}`]);
-    resetForm();
-  }, []);
-
   const handleCreate = useCallback(({ boardName, ...colNames }: any) => {
-    addBoardAction(boardName, Object.values(colNames)).then(() => {
-      reset();
+    addBoardAction(boardName, Object.values(colNames)).then((board) => {
+      setActiveBoardAction(board!.id)
       setShowModal(false);
     });
   }, []);

@@ -40,7 +40,7 @@ export const addBoardAction = async (name: string, columnNames?: string[]) => {
           });
         }
       }
-      return "addBoard success";
+      return board;
     })
     .catch((err) => {
       console.log(err);

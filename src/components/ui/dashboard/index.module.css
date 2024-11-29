@@ -7,6 +7,5 @@
   width: 100%;
   flex-shrink: 1;
   grid-auto-flow: column;
-  overscroll-behavior: contain;
   @apply bg-cust-slate-100 p-8 pl-0 sm:pl-8;
 }
