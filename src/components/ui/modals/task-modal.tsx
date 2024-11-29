@@ -175,9 +175,7 @@ const EditTaskContent = ({
   });
 
   const [subtasks, setSubtasks] = useState<string[]>(
-    !oldSubtasks.length
-      ? [`subtask-${getRandId()}`]
-      : oldSubtasks.map((st) => st.id)
+    oldSubtasks?.map((st) => st.id) || []
   );
 
   const handleUpdate = useCallback((formData: any) => {
@@ -208,7 +206,7 @@ const EditTaskContent = ({
           <Input
             autoFocus
             placeholder="e.g: Build a rocket that can fly to other galaxies and make contact with aliens."
-            {...register("desc", { required: "Description requied" })}
+            {...register("desc")}
             errMsg={errors["desc"]?.message as string}
           />
         </div>

@@ -7,13 +7,14 @@ import {
   Input,
   Modal,
 } from "@/components/core";
+import { MODAL_CLOSE_ANIM_TIME } from "@/libs/constants";
 import { IModalProps } from "@/libs/types";
 import getRandId from "@/libs/utils/getRandId";
 import { Plus } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
-const AddBoardModal = ({
+const M = ({
   showModal,
   setShowModal,
   onClose,
@@ -103,4 +104,13 @@ const AddBoardModal = ({
   );
 };
 
-export default AddBoardModal;
+export default function AddBoardModal(props: Omit<IModalProps, "children">) {
+  const [mount, setMount] = useState(false);
+
+  useEffect(() => {
+    if (props.showModal) setMount(true);
+    else setTimeout(() => setMount(false), MODAL_CLOSE_ANIM_TIME);
+  }, [props.showModal]);
+
+  return mount ? <M {...props} /> : null;
+}

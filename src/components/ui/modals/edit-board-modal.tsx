@@ -7,6 +7,7 @@ import {
   Input,
   Modal,
 } from "@/components/core";
+import { MODAL_CLOSE_ANIM_TIME } from "@/libs/constants";
 import { IModalProps } from "@/libs/types";
 import getRandId from "@/libs/utils/getRandId";
 import { useBoardStore, useColumnStore } from "@/store";
@@ -126,7 +127,7 @@ export default function EditBoardModal(props: Omit<IModalProps, "children">) {
 
   useEffect(() => {
     if (props.showModal) setMount(true);
-    else setTimeout(() => setMount(false), 300);
+    else setTimeout(() => setMount(false), MODAL_CLOSE_ANIM_TIME);
   }, [props.showModal]);
 
   return mount ? <M {...props} /> : null;

@@ -4,4 +4,5 @@ const LOCAL_KEYS = {
   IS_SIDENAV_OPEN: "sidenav_open",
 };
 
+export const MODAL_CLOSE_ANIM_TIME = 300
 export { LOCAL_KEYS };
