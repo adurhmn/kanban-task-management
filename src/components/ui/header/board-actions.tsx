@@ -46,7 +46,6 @@ export default function BoardActions() {
       <EditBoardModal
         showModal={showEditBoardModal}
         setShowModal={setShowEditBoardModal}
-        boardId={activeBoard}
       />
       <DeleteBoardModal
         board={board}

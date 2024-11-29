@@ -11,47 +11,42 @@ import { IModalProps } from "@/libs/types";
 import getRandId from "@/libs/utils/getRandId";
 import { useBoardStore, useColumnStore } from "@/store";
 import { Plus } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
-const EditBoardModal = ({
-  boardId,
+const M = ({
   showModal,
   setShowModal,
   onClose,
-}: { boardId: string } & Omit<IModalProps, "children">) => {
-  const { boards: allBoards } = useBoardStore();
-  const board = allBoards?.find((b) => b.id === boardId);
+}: Omit<IModalProps, "children">) => {
+  const { boards: allBoards, activeBoard } = useBoardStore();
+  const board = allBoards?.find((b) => b.id === activeBoard);
   const { columns: allColumns } = useColumnStore();
-  const oldCols = allColumns?.[boardId] || [];
+  const oldCols = allColumns![activeBoard] || [];
+  const [cols, setCols] = useState(oldCols.map(({ id }) => id));
 
   const {
     register,
     unregister,
     formState: { errors },
     handleSubmit,
-    // reset: resetForm,
   } = useForm<{ name: string; [key: string]: string }>({
     defaultValues: {
-      name: board?.name,
-      ...oldCols.reduce((acc, st) => {
-        acc[st.id] = st.name;
+      name: board!.name,
+      ...oldCols.reduce((acc, cur) => {
+        acc[cur.id] = cur.name;
         return acc;
-      }, {} as { [id: string]: string }),
+      }, {} as any),
     },
   });
 
-  const [cols, setCols] = useState(
-    oldCols.length ? oldCols.map((c) => c.id) : [`col-${getRandId()}`]
-  );
 
-  const handleCreate = useCallback((formData: any) => {
+  const handleCreate = (formData: any) =>
     editBoardAction({ board: board!, oldColumns: oldCols, formData }).then(
       () => {
         setShowModal(false);
       }
     );
-  }, []);
 
   return (
     <Modal showModal={showModal} setShowModal={setShowModal} onClose={onClose}>
@@ -126,4 +121,13 @@ const EditBoardModal = ({
   );
 };
 
-export default EditBoardModal;
+export default function EditBoardModal(props: Omit<IModalProps, "children">) {
+  const [mount, setMount] = useState(false);
+
+  useEffect(() => {
+    if (props.showModal) setMount(true);
+    else setTimeout(() => setMount(false), 300);
+  }, [props.showModal]);
+
+  return mount ? <M {...props} /> : null;
+}

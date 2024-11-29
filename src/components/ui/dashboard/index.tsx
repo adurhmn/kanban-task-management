@@ -49,44 +49,51 @@ export default function Dashboard() {
     );
   }
   if (!activeBoard) return <NoBoardsContent />;
-  if (!columns || columns.length === 0)
-    return <NoColsContent handleAddCol={() => setShowEditBoardModal(true)} />;
 
   return (
     <>
-      <Droppable
-        droppableId="columns"
-        type={DROPPABLE_TYPE.COLUMNS}
-        direction="horizontal"
-      >
-        {(provided) => (
-          <div
-            className={styles.columnsWrapper}
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-          >
-            {columns.map((c) => (
-              <Draggable draggableId={c.id} index={c.index} key={c.id}>
-                {(provided, snapshot) => (
-                  <Column column={c} provided={provided} snapshot={snapshot} />
-                )}
-              </Draggable>
-            ))}
-            {provided.placeholder}
-            <button
-              className="w-[300px] h-full bg-cust-prim-light/10 flex items-center justify-center rounded-lg ml-8"
-              onClick={() => setShowEditBoardModal(true)}
+      {!columns || columns.length === 0 ? (
+        <NoColsContent handleAddCol={() => setShowEditBoardModal(true)} />
+      ) : (
+        <Droppable
+          droppableId="columns"
+          type={DROPPABLE_TYPE.COLUMNS}
+          direction="horizontal"
+        >
+          {(provided) => (
+            <div
+              className={styles.columnsWrapper}
+              ref={provided.innerRef}
+              {...provided.droppableProps}
             >
-              <p className="h1 text-cust-slate-300 text-center">+ New Column</p>
-            </button>
-          </div>
-        )}
-      </Droppable>
+              {columns.map((c) => (
+                <Draggable draggableId={c.id} index={c.index} key={c.id}>
+                  {(provided, snapshot) => (
+                    <Column
+                      column={c}
+                      provided={provided}
+                      snapshot={snapshot}
+                    />
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+              <button
+                className="w-[300px] h-full bg-cust-prim-light/10 flex items-center justify-center rounded-lg ml-8"
+                onClick={() => setShowEditBoardModal(true)}
+              >
+                <p className="h1 text-cust-slate-300 text-center">
+                  + New Column
+                </p>
+              </button>
+            </div>
+          )}
+        </Droppable>
+      )}
 
       <EditBoardModal
         showModal={showEditBoardModal}
         setShowModal={setShowEditBoardModal}
-        boardId={activeBoard}
       />
       <TaskModal />
     </>
