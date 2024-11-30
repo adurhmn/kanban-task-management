@@ -103,7 +103,10 @@ const NavItem = ({
 export default function SideNav() {
   const { boards, activeBoard } = useBoardStore();
   const [isOpen, setIsOpen] = useState(
-    localStorage.getItem(LOCAL_KEYS.IS_SIDENAV_OPEN) == "1"
+    localStorage.getItem(LOCAL_KEYS.IS_SIDENAV_OPEN) === "1" ||
+      localStorage.getItem(LOCAL_KEYS.IS_SIDENAV_OPEN) === null
+      ? true
+      : false
   );
   const [showAddBoardModal, setShowAddBoardModal] = useState(false);
 
